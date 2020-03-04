@@ -1,6 +1,6 @@
 # 这里记录了我的一些笔记！
 
-![lecker](./figs/lecker.jpg)
+![lecker](./figs/lecker_small.jpg)
 *Schweinshaxe und Bier.*
 
 ## Linux小技巧
