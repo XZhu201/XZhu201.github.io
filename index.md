@@ -3,6 +3,9 @@
 ![lecker](./figs/lecker.jpg)
 *Schweinshaxe und Bier.*
 
-## 码农的奇技淫巧
-- [Linux批量更改或替换文件方法](./码农的奇技淫巧/Linux批量更改或替换文件方法.md)
-- [Linux批量提交job方法](./码农的奇技淫巧/一次性提交多个job的方法.md)
+## Linux小技巧
+- [Linux批量更改或替换文件方法](./linux/Linux批量更改或替换文件方法.md)
+- [Linux批量提交job方法](./linux/一次性提交多个job的方法.md)
+
+## Matlab小技巧
+- [尝试向量化调用ode45](./matlab/try_vectrorized_ode45.html)

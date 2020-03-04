@@ -9,7 +9,7 @@ theta_rot = 0*pi/180;  % additional rotation angle
 现要把所有的`theta_rot = 0*pi`改成`theta_rot = 20*pi`。
 
 可以先用`find`找出所有的该文件，然后用`sed -i`来替换相关语句，其中前后两个操作用*xargs*传递参数。具体如下
-``` 
+``` bash
 find -name "para_laser.m" | xargs sed -i "s/theta_rot = 0/theta_rot = 20/g"
 ```
 其中 `-i` 指的是在[原文件上更改](https://www.jianshu.com/p/89163e927a2c)。
