@@ -1,9 +1,11 @@
+
+<!DOCTYPE html>
 <html>
   <head>
     
 <meta charset="utf-8" >
 
-<title>xzhu201</title>
+<title>一次性提交多个job的方法 | xzhu201</title>
 <meta name="description" content="温故而知新">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -75,15 +77,32 @@
 </transition>
 
 
-        <div class="content-container">
+      <div class="content-container">
+        <div class="post-detail">
           
-          <div class="tags-container">
+          <h2 class="post-title">一次性提交多个job的方法</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-03-03</span>
             
           </div>
+          <div class="post-content">
+            <p>这个是Florian教我的，利用bash的for命令来实现。感谢Florian！以下是他的邮件内容：</p>
+<blockquote>
+<p>for f in *.qs; do qsub $f; done<br>
+for d in *; do for f in $d/*; do qsub $f; done; done<br>
+for f in */*; do qsub $f; done<br>
+Use &quot;echo qsub $f&quot; instead of &quot;qsub $f&quot; for testing.</p>
+</blockquote>
 
+          </div>
         </div>
 
-        <div class="site-footer">
+        
+      </div>
+
+      
+
+      <div class="site-footer">
   <div class="slogan">温故而知新</div>
   <div class="social-container">
     
@@ -102,8 +121,8 @@
 </div>
 
 
-      </div>
-      <script type="application/javascript">
+    </div>
+    <script type="application/javascript">
 
 hljs.initHighlightingOnLoad()
 
@@ -119,6 +138,5 @@ var app = new Vue({
 
 
 
-    </div>
   </body>
 </html>

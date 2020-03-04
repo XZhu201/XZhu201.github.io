@@ -1,45 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://https://xzhu201.github.io/</id>
-    <title>Gridea</title>
-    <updated>2020-03-03T23:53:55.328Z</updated>
+    <title>xzhu201</title>
+    <updated>2020-03-04T00:03:34.555Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://https://xzhu201.github.io/"/>
     <link rel="self" href="https://https://xzhu201.github.io/atom.xml"/>
     <subtitle>温故而知新</subtitle>
     <logo>https://https://xzhu201.github.io/images/avatar.png</logo>
     <icon>https://https://xzhu201.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2020, Gridea</rights>
+    <rights>All rights reserved 2020, xzhu201</rights>
     <entry>
-        <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>https://https://xzhu201.github.io/post/hello-gridea/</id>
-        <link href="https://https://xzhu201.github.io/post/hello-gridea/">
+        <title type="html"><![CDATA[Linux批量更改或替换文件方法]]></title>
+        <id>https://https://xzhu201.github.io/post/linux-pi-liang-geng-gai-huo-ti-huan-wen-jian-fang-fa/</id>
+        <link href="https://https://xzhu201.github.io/post/linux-pi-liang-geng-gai-huo-ti-huan-wen-jian-fang-fa/">
         </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
+        <updated>2020-03-03T16:57:57.000Z</updated>
+        <content type="html"><![CDATA[<p>很多时候我们需要一次性更改一系列计算中的某个参数。有两种方法：</p>
+<h4 id="1-直接批量修改相应的文件内容">1. 直接批量修改相应的文件内容</h4>
+<p>比如，要把整个文件夹下各个子文件夹中<em>para_laser.m</em>文件内的<em>theta_rot</em>参数进行替换。具体的这一行的内容为：</p>
+<pre><code class="language-matlab">theta_rot = 0*pi/180;  % additional rotation angle
+</code></pre>
+<p>现要把所有的<code>theta_rot = 0*pi</code>改成<code>theta_rot = 20*pi</code>。</p>
+<p>可以先用<code>find</code>找出所有的该文件，然后用<code>sed -i</code>来替换相关语句，其中前后两个操作用<em>xargs</em>传递参数。具体如下</p>
+<pre><code>find -name &quot;para_laser.m&quot; | xargs sed -i &quot;s/theta_rot = 0/theta_rot = 20/g&quot;
+</code></pre>
+<p>其中 <code>-i</code> 指的是在<a href="https://www.jianshu.com/p/89163e927a2c">原文件上更改</a>。</p>
+<p>值得提醒的是，和所有的其他linux操作中一样，为了安全起见，最好先用 <code>grep</code>命令把第一步会<code>find</code>出什么显示出来，确认都是正确的之后，再执行替换：</p>
+<pre><code>find -name &quot;para_laser.m&quot; | xargs grep &quot;theta_rot = 0&quot;
+</code></pre>
+<h4 id="2-把修改好的一个文件复制到所有的文件夹中">2. 把修改好的一个文件复制到所有的文件夹中</h4>
+<p>有时候需要批量修改的内容比较多，可以曲线救国，先更改一个文件。然后把这个更改后正确的文件一口气复制到所有的目标文件夹中。</p>
+<p>比如，我有以下这么多文件夹：</p>
+<blockquote>
+<p>drwxrwxrwx 1 *** 4096 Mar  1 13:44 0.1_linear_single_k0/<br>
+drwxrwxrwx 1 *** 4096 Mar  1 13:44 0.2_compare_linear/<br>
+drwxrwxrwx 1 *** 4096 Mar  1 18:56 0_linear_301pts/<br>
+...<br>
+drwxrwxrwx 1 *** 4096 Mar  1 18:56 8_1to3_301pts/<br>
+drwxrwxrwx 1 *** 4096 Mar  1 19:13 9_1to4_301pts/</p>
+</blockquote>
+<p>其中以<em>pts</em>结尾的文件夹中的<em>HHS_statistics.m</em>文件的内容都需要做相同的更改，但是这个更改用上面的方法不容易实现。我可以首先在当前位置改好一个正确的<em>HHS_statistics.m</em>，然后把他复制到所有的目录中。</p>
+<p>具体的思路仍是先用<code>find</code>找到想要的文件夹，（用<code>grep</code>）确认<code>find</code>的结果无误后，用xargs传参并用cp进行替换：</p>
+<pre><code>find -type d -name &quot;*pts&quot; | xargs -n 1 cp -r ./HHS_statistics.m
+</code></pre>
+<p>这里值得注意的是采用了<code>-n 1</code>参数[^n1]，否则会失败。他的含义是 <a href="https://blog.csdn.net/yangshangwei/article/details/54424526">告诉 xargs 命令每个命令行最多使用一个参数，并发送到 cp 命令中</a>。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[一次性提交多个job的方法]]></title>
+        <id>https://https://xzhu201.github.io/post/yi-ci-xing-ti-jiao-duo-ge-job-de-fang-fa/</id>
+        <link href="https://https://xzhu201.github.io/post/yi-ci-xing-ti-jiao-duo-ge-job-de-fang-fa/">
+        </link>
+        <updated>2020-03-03T03:01:07.000Z</updated>
+        <content type="html"><![CDATA[<p>这个是Florian教我的，利用bash的for命令来实现。感谢Florian！以下是他的邮件内容：</p>
+<blockquote>
+<p>for f in *.qs; do qsub $f; done<br>
+for d in *; do for f in $d/*; do qsub $f; done; done<br>
+for f in */*; do qsub $f; done<br>
+Use &quot;echo qsub $f&quot; instead of &quot;qsub $f&quot; for testing.</p>
+</blockquote>
 ]]></content>
     </entry>
 </feed>
