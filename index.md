@@ -11,4 +11,4 @@
 - [尝试向量化调用ode45](./matlab/try_vectrorized_ode45.html)
 
 ## Mathematica小技巧
-- [用MMA画动画](./MMA/用MMA画动画.pdf) 
+- [用MMA画动画](MMA\用MMA画动画\用MMA画动画.pdf) （[源文件](MMA\用MMA画动画\PlotMovieWithMMA.nb)）
