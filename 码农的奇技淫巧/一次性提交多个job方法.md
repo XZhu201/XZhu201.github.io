@@ -4,3 +4,28 @@
 > for d in \*; do for f in \$d/\*; do qsub \$f; done; done  
 > for f in \*/\*; do qsub \$f; done  
 > Use "echo qsub \$f" instead of "qsub \$f" for testing.
+
+以上三个方法中的第三个方法应该是最简单有效的方法。第四行是提醒我们，在linux操作中，最好先把会进行的操作显示出来检查一下，然后再做。
+
+我测试了第三种方法之后，比如`for dd in */go.matlab.job; do qsub $dd; done`，会发现确实提交了子文件夹中的所有*go.matlab.job*命令。但是由于当前文件夹不是*go.matlab.job*，所以立马会报错说找不到计算所需的文件。
+
+针对这个问题，我学习了一下bash中for具体是如何操作的[^bashfor]，然后自己写了下面的脚本：
+
+``` bash
+for dd in *;
+do
+        echo cd $dd;
+        cd $dd;
+        echo qsub go.matlab.job
+        qsub go.matlab.job
+        cd ..
+done
+```
+
+即先cd进相应的文件夹，然后用`qsub`命令提交[^gom]，再cd回来重复下一个循环。
+
+结果成功提交了所有作业并且在正常计算。但是这一个脚本**还有一个缺陷**：第一行不应该是\*，这样他会尝试对所有的文件夹、目录都进行循环内的操作。
+
+
+[^bashfor]: https://blog.csdn.net/guodongxiaren/article/details/41911437
+[^gom]: 不能用我alias的命令，如*gom*，会报错不认识这个命令的。

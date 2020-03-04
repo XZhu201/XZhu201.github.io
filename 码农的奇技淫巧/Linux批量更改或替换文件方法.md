@@ -18,7 +18,7 @@ find -name "para_laser.m" | xargs sed -i "s/theta_rot = 0/theta_rot = 20/g"
 
 值得提醒的是，和所有的其他linux操作中一样，为了安全起见，最好先用 `grep`命令把第一步会`find`出什么显示出来，确认都是正确的之后，再执行替换：
 
-```
+``` bash
 find -name "para_laser.m" | xargs grep "theta_rot = 0"
 ```
 
@@ -38,7 +38,7 @@ find -name "para_laser.m" | xargs grep "theta_rot = 0"
 其中以*pts*结尾的文件夹中的*HHS_statistics.m*文件的内容都需要做相同的更改，但是这个更改用上面的方法不容易实现。我可以首先在当前位置改好一个正确的*HHS_statistics.m*，然后把他复制到所有的目录中。
 
 具体的思路仍是先用`find`找到想要的文件夹，（用`grep`）确认`find`的结果无误后，用xargs传参并用cp进行替换：
-```
+``` bash
 find -type d -name "*pts" | xargs -n 1 cp -r ./HHS_statistics.m
 ```
 这里值得注意的是采用了`-n 1`参数[^n1]，否则会失败。他的含义是 [告诉 xargs 命令每个命令行最多使用一个参数，并发送到 cp 命令中](https://blog.csdn.net/yangshangwei/article/details/54424526)。
