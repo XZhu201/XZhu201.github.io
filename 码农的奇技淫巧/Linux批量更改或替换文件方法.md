@@ -29,11 +29,16 @@ find -name "para_laser.m" | xargs grep "theta_rot = 0"
 
 比如，我有以下这么多文件夹：
 > drwxrwxrwx 1 *** 4096 Mar  1 13:44 0.1_linear_single_k0/
-drwxrwxrwx 1 *** 4096 Mar  1 13:44 0.2_compare_linear/
-drwxrwxrwx 1 *** 4096 Mar  1 18:56 0_linear_301pts/
-...
-drwxrwxrwx 1 *** 4096 Mar  1 18:56 8_1to3_301pts/
-drwxrwxrwx 1 *** 4096 Mar  1 19:13 9_1to4_301pts/
+>
+> drwxrwxrwx 1 *** 4096 Mar  1 13:44 0.2_compare_linear/
+>
+> drwxrwxrwx 1 *** 4096 Mar  1 18:56 0_linear_301pts/
+>
+> ...
+>
+> drwxrwxrwx 1 *** 4096 Mar  1 18:56 8_1to3_301pts/
+>
+> drwxrwxrwx 1 *** 4096 Mar  1 19:13 9_1to4_301pts/
 
 其中以*pts*结尾的文件夹中的*HHS_statistics.m*文件的内容都需要做相同的更改，但是这个更改用上面的方法不容易实现。我可以首先在当前位置改好一个正确的*HHS_statistics.m*，然后把他复制到所有的目录中。
 
