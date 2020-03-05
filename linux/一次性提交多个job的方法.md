@@ -28,7 +28,7 @@ done
 1. 第一行不应该是\*，这样他会尝试对所有的文件夹、目录都进行循环内的操作；
 2. 如Florian所提醒的，最好先用echo把要执行的命令检查一遍，再真正执行。
 
-综上我想命令应该是这样的，但是还没有机会测试：
+综上，命令应该是这样的：
 
 ``` bash
 for dd in *Tuv   # 扫参数的文件夹以"Tuv"结尾
@@ -44,6 +44,22 @@ done
 ```
 
 第一次计算的时候把第二块注释掉，跑一遍。检查无误后，去掉注释正式再跑一遍。
+
+运行之后的输出如下：
+``` bash
+./mulgo 
+
+cd 1_3Tuv  
+qsub go.matlab.job  
+4701882.batch.css.lan  
+cd 2_1Tuv  
+qsub go.matlab.job  
+4701883.batch.css.lan  
+cd 3_2Tuv  
+qsub go.matlab.job  
+4701884.batch.css.lan  
+
+```
 
 
 [^bashfor]: https://blog.csdn.net/guodongxiaren/article/details/41911437
