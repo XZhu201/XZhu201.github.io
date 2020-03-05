@@ -12,25 +12,6 @@
 针对这个问题，我学习了一下bash中for具体是如何操作的[^bashfor]，然后自己写了下面的脚本：
 
 ``` bash
-for dd in *;
-do
-        echo cd $dd;
-        cd $dd;
-        echo qsub go.matlab.job
-        qsub go.matlab.job
-        cd ..
-done
-```
-
-即先cd进相应的文件夹，然后用`qsub`命令提交[^gom]，再cd回来重复下一个循环。
-
-结果成功提交了所有作业并且在正常计算。还存在以下问题：
-1. 第一行不应该是\*，这样他会尝试对所有的文件夹、目录都进行循环内的操作；
-2. 如Florian所提醒的，最好先用echo把要执行的命令检查一遍，再真正执行。
-
-综上，命令应该是这样的：
-
-``` bash
 for dd in *Tuv   # 扫参数的文件夹以"Tuv"结尾
 do
         echo cd $dd;
@@ -43,7 +24,9 @@ do
 done
 ```
 
-第一次计算的时候把第二块注释掉，跑一遍。检查无误后，去掉注释正式再跑一遍。
+即先cd进相应的文件夹，然后用`qsub`命令提交[^gom]，再cd回来重复下一个循环。
+
+根据Florian的建议，出于在linux系统上避免误操作的安全性考虑，可以第一次计算的时候把第二块注释掉，跑一遍。检查无误后，去掉注释正式再跑一遍。
 
 运行之后的输出如下：
 ``` bash
@@ -62,5 +45,5 @@ qsub go.matlab.job
 ```
 
 
-[^bashfor]: https://blog.csdn.net/guodongxiaren/article/details/41911437
+[^bashfor]: [https://blog.csdn.net/guodongxiaren/article/details/41911437](https://blog.csdn.net/guodongxiaren/article/details/41911437)
 [^gom]: 不能用我alias的命令，如*gom*，会报错不认识这个命令的。
