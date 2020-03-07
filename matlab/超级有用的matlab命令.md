@@ -7,5 +7,3 @@ dbstop命令本身的作用是*设置断点用于调试*，还有很多参数可
 
 ### 2. [diary](https://ww2.mathworks.cn/help/matlab/ref/diary.html)
 在服务器上提交作业，如果遇到错误有时候输出的报错并不清晰，很难了解到错在哪里。可以使用，matlab会把程序和相应的输出写在diary中。
-
-Edit with Notepad++
