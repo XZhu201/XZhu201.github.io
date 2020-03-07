@@ -1,15 +1,9 @@
-# 这里记录了我的一些笔记！
+# 不定期更新matlab中超级有用的各种小命令
 
-![lecker](./figs/lecker_small.jpg)
-*Schweinshaxe und Bier.*
+### 1. [dbstop if error](https://ww2.mathworks.cn/help/matlab/ref/dbstop.html)
+对于喜欢写function的我来说，debug是一个超级麻烦的事情。通常而言，如果matlab遇到错误就会直接退出，并且释放function内的所有变量，导致没法检查究竟错在哪里。当然，标准的操作就是设置断点一步一步的检查。但是，在命令行中敲了`dbstop if error`之后，matlab在运行到错误的时候就会自动停在报错的地方，并不释放function中的变量。以后遇到以来之外的错误也可以直接分析了。
 
-## Linux小技巧
-- [Linux批量更改或替换文件方法](./linux/Linux批量更改或替换文件方法.md)
-- [Linux批量提交job方法](./linux/一次性提交多个job的方法.md)
+dbstop命令本身的作用是*设置断点用于调试*，还有很多参数可以研究，见[matlab的文档](https://ww2.mathworks.cn/help/matlab/ref/dbstop.html)。
 
-## Matlab小技巧
-- [超级有用的matlab命令](matlab\超级有用的matlab命令.md)
-- [尝试向量化调用ode45](matlab\向量化调用ode45\try_vectrorized_ode45.html) （[源文件](matlab\向量化调用ode45\try_vectrorized_ode45.mlx)）
-
-## Mathematica小技巧
-- [用MMA画动画](MMA\用MMA画动画\用MMA画动画.pdf) （[源文件](MMA\用MMA画动画\PlotMovieWithMMA.nb)）
+### 2. [diary](https://ww2.mathworks.cn/help/matlab/ref/diary.html)
+在服务器上提交作业，如果遇到错误有时候输出的报错并不清晰，很难了解到错在哪里。可以使用，matlab会把程序和相应的输出写在diary中。
