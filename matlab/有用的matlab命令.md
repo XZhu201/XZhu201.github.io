@@ -1,5 +1,3 @@
-# 不定期更新matlab中超级有用的各种小命令
-
 推荐看知乎上的问题[有哪些让人相见恨晚的 MATLAB 命令？](https://www.zhihu.com/question/24499729)这里我会根据自己的体会，把亲测对我们具体的工作有很大帮助的记录在下面。
 
 ### 1. [dbstop if error](https://ww2.mathworks.cn/help/matlab/ref/dbstop.html)
