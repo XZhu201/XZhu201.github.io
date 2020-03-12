@@ -23,7 +23,7 @@ find -name "para_laser.m" | xargs grep "theta_rot = 0"
 
 **如果要替换的字符串中出现特殊符号**
 
-可以使用转义符`\`。比如要把`str_output = '../00_fromCLY/sv_gs_outputs.mat'`换成`str_output = '../../00_fromCLY\/sv_gs_outputs.mat'`
+可以使用转义符`\`。比如要把`str_output = '../00_fromCLY/sv_gs_outputs.mat'`换成`str_output = '../../00_fromCLY/sv_gs_outputs.mat'`
 ``` bash
 find -name "main.m" | xargs sed -i "s/str_output = '..\/00_fromCLY\/sv_gs_outputs.mat'/str_output = '..\/..\/00_fromCLY\/sv_gs_outputs.mat'/g"
 ```
