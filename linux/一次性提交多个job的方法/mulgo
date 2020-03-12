@@ -1,0 +1,10 @@
+for dd in *
+do
+        echo cd $dd;
+        echo qsub go.matlab.job
+
+        cd $dd;
+        qsub go.matlab.job
+
+        cd ..
+done
