@@ -15,14 +15,17 @@ find -name "para_laser.m" | xargs sed -i "s/theta_rot = 0/theta_rot = 20/g"
 其中 `-i` 指的是在[原文件上更改](https://www.jianshu.com/p/89163e927a2c)。
 
 
-
 值得提醒的是，和所有的其他linux操作中一样，为了安全起见，最好先用 `grep`命令把第一步会`find`出什么显示出来，确认都是正确的之后，再执行替换：
 
 ``` bash
 find -name "para_laser.m" | xargs grep "theta_rot = 0"
 ```
 
-
+###### 如果要替换的字符串中出现特殊符号
+可以使用转义符`\`。比如要把`str_output = '../00_fromCLY/sv_gs_outputs.mat'`换成`str_output = '../../00_fromCLY\/sv_gs_outputs.mat'`
+``` bash
+find -name "main.m" | xargs sed -i "s/str_output = '..\/00_fromCLY\/sv_gs_outputs.mat'/str_output = '..\/..\/00_fromCLY\/sv_gs_outputs.mat'/g"
+```
 
 #### 2. 把修改好的一个文件复制到所有的文件夹中
 有时候需要批量修改的内容比较多，可以曲线救国，先更改一个文件。然后把这个更改后正确的文件一口气复制到所有的目标文件夹中。
