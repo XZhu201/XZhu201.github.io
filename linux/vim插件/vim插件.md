@@ -8,8 +8,11 @@
 [Vim插件管理器Pathogen和Vundle简介 - Vim入门教程(8)](https://vimjc.com/vim-plugin-manager.html)
 
 ### vim插件配置
-接下来就是选择需要的插件，并进行配置，即配置`.vimrc`文件。我的配置文件是这样的（[源文件](.vimrc)）：
-```bash
+接下来就是选择需要的插件，并进行配置，即配置`.vimrc`文件。我的配置文件是这样的:
+
+[下载文件](./vimrc)
+
+```
 set nocompatible               "去除VIM一致性，必须"
 filetype off                   "必须"
 
