@@ -1,5 +1,8 @@
 # 这里只统计我自己运用中常用到的git命令
 
+使用git管理自己的项目时，根据具体情况，注意该设置为私有的项目要**记得设置为私有**。
+
+
 ### 0. 推荐采用图形化的界面，比如[github desktop](https://desktop.github.com/)
 
 github desktop在windows或者linux下都有，易于安装使用。学习成本较低，而且不容易犯错。
