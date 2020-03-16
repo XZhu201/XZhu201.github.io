@@ -13,7 +13,7 @@ github desktop在windows或者linux下都有，易于安装使用。学习成本
 - `git pull`
 
 ##### 推送三连：
-- `git status`
+- `git add .`
 - `git commit -m "内容"`
 - `git pull`
 
