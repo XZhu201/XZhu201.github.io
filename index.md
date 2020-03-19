@@ -10,6 +10,7 @@
 - [Linux批量提交job方法](./linux/一次性提交多个job的方法/一次性提交多个job的方法.md) ([源文件](./linux/一次性提交多个job的方法/mulgo))
 
 ## Matlab小技巧
+- [parpool报错问题](./matlab/parpool报错问题.md)
 - [超级有用的matlab命令](matlab/超级有用的matlab命令.md)
 - [尝试向量化调用ode45](matlab/向量化调用ode45/try_vectrorized_ode45.html) （[源文件](matlab/向量化调用ode45/try_vectrorized_ode45.mlx)）
 
