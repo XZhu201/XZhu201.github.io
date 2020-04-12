@@ -9,3 +9,11 @@ dbstop命令本身的作用是*设置断点用于调试*，还有很多参数可
 
 ### 2. [diary](https://ww2.mathworks.cn/help/matlab/ref/diary.html)
 在服务器上提交作业，如果遇到错误有时候输出的报错并不清晰，很难了解到错在哪里。可以使用，matlab会把程序和相应的输出写在diary中。
+
+### 3. [findpeaks](https://www.mathworks.com/help/signal/ref/findpeaks.html)
+在matlab里面手动找峰值及其位置虽然也不那么困难，不过这个命令可以自动的批量找出峰来。常用的调用是：
+``` matlab
+[pks,locs] = findpeaks(data)
+```
+其中：pks是峰值，locs是峰所走的坐标。
+也可以返回更多的值：`[pks,locs,w,p] = findpeaks(data)`。这里w返回峰的宽度，p返回“ the prominences of the peaks”。
