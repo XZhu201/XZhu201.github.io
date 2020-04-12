@@ -16,6 +16,7 @@
 
 ## Mathematica小技巧
 - [用MMA画动画](MMA/用MMA画动画/用MMA画动画.pdf) （[源文件](MMA/用MMA画动画/PlotMovieWithMMA.nb)）
+- [MMA中的Abs求导的问题](./MMA/MMA中的Abs求导的问题.md)
 
 ## 其他
 - [有用的网站](./others/有用的网站/有用的网站.md)
