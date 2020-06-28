@@ -25,3 +25,9 @@ github desktop在windows或者linux下都有，易于安装使用。学习成本
 - `git log`: 会列出之前一系列的commit。
 
 [^matlab]: 其实在matlab命令行中，以`!`开头，也可以使用git命令，比如`!git push`。当然，如果是在windows中用matlab，需要先装一个windows中的git。
+
+### 3. git免密码配置方法
+
+`git config --global credential.helper store`
+
+输入一次账号密码后第二次就会记住账号密码。可以在~/.git-credentials查看。
