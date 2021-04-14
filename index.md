@@ -20,3 +20,4 @@
 
 ## 其他
 - [有用的网站](./others/有用的网站/有用的网站.md)
+- [投稿前的checklist](./others/投稿前的checklist/check_before_submition.md)
