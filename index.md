@@ -9,7 +9,7 @@
 - [git常用命令](./linux/git常用命令/git常用命令.md)
 - [Linux批量更改或替换文件方法](./linux/Linux批量更改或替换文件方法.md)
 - [Linux批量提交job方法](./linux/一次性提交多个job的方法/一次性提交多个job的方法.md) ([源文件](./linux/一次性提交多个job的方法/mulgo))
-- 有用的bash脚本技巧
+- [有用的bash脚本技巧](./linux/bash_useful_tricks/useful_bash.md)
 
 ## Matlab小技巧
 

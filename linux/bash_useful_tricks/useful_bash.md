@@ -20,7 +20,9 @@
   
   - [shell怎么产生一个随机数，要求是0到1之间的，小数位数是16位 - Shell-Chinaunix](http://bbs.chinaunix.net/thread-4176958-1-1.html)
 
-- [生成序列，类似matlab中的linspace的方法](https://blog.csdn.net/Golden_Chen/article/details/115375482)
+- [生成序列，类似matlab中的linspace的方法](https://blog.csdn.net/Golden_Chen/article/details/115375482) 
+
+# 
 
 # 2. 我自己的例子
 
