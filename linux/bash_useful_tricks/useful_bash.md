@@ -11,6 +11,7 @@
   - [使用正则表达式抽取所需文本 - 琴水玉 - 博客园](https://www.cnblogs.com/lovesqcc/p/12443108.html)
   - [shell提取字符串中的字母，数字和小数 - Philbert - 博客园](https://www.cnblogs.com/liangxuran/p/14578866.html)
   - [还可以更精细的利用cut依次读取每一行中第几个值](https://jamesgosling.blog.csdn.net/article/details/124703381?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-124703381-blog-103009117.pc_relevant_multi_platform_whitelistv3&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-124703381-blog-103009117.pc_relevant_multi_platform_whitelistv3&utm_relevant_index=1)
+  - [cut使用详解](https://blog.csdn.net/Zheng__Huang/article/details/108015558#:~:text=cut%E5%91%BD%E4%BB%A4%E6%98%AFBa,%E4%BB%B6%E6%88%AA%E5%8F%96%E5%87%BA%E5%85%B6%E4%B8%AD%E5%87%A0%E5%88%97)
 
 ### 数学相关
 
