@@ -81,16 +81,16 @@ done # end of for R
 ```
 
 - 依次从文件`param_R.csv`中读取之前生成好的随机数R和它的序号，修改.gjf文件，用高斯计算，并进一步生成cube文件。cubegen所需格点参数存在文件`npts`中。然后建立相应的文件夹，把生成的文件存入到制定的文件夹中。
+- 由于R改变的时候会出现能级交叉的现象，所以增加了自动从.log文件中识别sigma轨道是第几个轨道sigmaNo，从而在cubegen参数中`mo=$sigmaNo`确定提取对应的轨道波函数。此外，提取对应轨道的轨道能量存起来。
 
 ```bash
 #!/bin/bash
-# 2022-09-29
 
 # Make sure that the last row of the .gjf file is something like "R xxx"
 
 # ----- input -----
 name='Gau'              # the file name is "name.gjf"
-datafile='param_R.csv'
+datafile='params_Rdiv2_I.csv'
 # -----------------
 
 mkdir sv_data
@@ -100,17 +100,17 @@ do
 
     # extract the two values of the line
     index=$(echo ${line} | cut -d ' ' -f 1) 
-    R=$(echo ${line} | cut -d ' ' -f 2)
+    R=$(echo ${line} | cut -d ' ' -f 2)                 # in fact R here is half R
 
     echo '----------------------------------------'
-    echo '---------- R'${index}'='${R}' ----------'
+    echo '---------- Rdiv2'${index}'='${R}' ----------'
     echo '----------------------------------------'
     echo ''
 
     echo '--- 1. Change gjf for mol R='${R}' ---'
 
-    sed -i '$c R '${R}'' ${name}.gjf  # replace the last row, -i means directly work on the file
-
+    sed -i '$c Rdiv2 '${R}'' ${name}.gjf  # replace the last row, -i means directly work on the file
+    
     echo 'The last row of '${name}.gjf' is:'
     sed -n '$p' ${name}.gjf   # show the last row of the file
     echo ''
@@ -119,13 +119,47 @@ do
     /opt/software/gaussian09/g09install/G09_Linux_Binary/tar/g09/g09 ${name}.gjf
     echo ''
 
-    echo '--- 3. genereate .cube ---'
-    /opt/software/gaussian09/g09install/G09_Linux_Binary/tar/g09/formchk Gau.chk
-    /opt/software/gaussian09/g09install/G09_Linux_Binary/tar/g09/cubegen 0 mo=homo Gau.fchk Gau.cube -1 h < npts
+    echo '--- 3. Determine which orbital to extract'
+    lineSym=$(sed -n "184p" Gau.log)                                             # read orbital symmetries
+    energies=$(grep "Alpha  occ. eigenvalues" Gau.log | grep -oP "\-\d*\.\d*")   # read orbital energies
+
+    echo ''
+    echo The symmetries of the orbitals:
+    echo $lineSym
+    echo The energies of the orbitals:
+    echo $energies
     echo ''
 
-    echo '--- 4. copy and save files ---'
 
+    sym8=$(echo $lineSym | cut -d '(' -f 8)
+    sym6=$(echo $lineSym | cut -d '(' -f 6)
+
+    if [ $sym8 == "SGG)" ];     # note the spaces are needed!  # the case for "... (PIU) (PIU) (SGG)"
+    then 
+        sigmaNo=7                # 8-1=7
+    elif [ $sym6 == "SGG)" ];     # note the spaces are needed!
+    then
+        sigmaNo=5                # 6-1=5
+    else
+        echo "!!!!! NO expected case is found !!!!!"
+    fi
+
+    echo Extracted state No.: $sigmaNo
+
+    # read orbital energies
+    OrbitalEnergy=$(echo $energies | cut -d ' ' -f $sigmaNo)
+    echo Orbital energy: $OrbitalEnergy
+    echo $OrbitalEnergy >OrbitalEnergy.csv          # write the extracted energy to the file "OrbitalEnergy.csv"
+    echo ''  
+
+
+    echo '--- 4. genereate .cube ---'
+    /opt/software/gaussian09/g09install/G09_Linux_Binary/tar/g09/formchk Gau.chk
+    /opt/software/gaussian09/g09install/G09_Linux_Binary/tar/g09/cubegen 0 mo=$sigmaNo Gau.fchk Gau.cube -1 h < npts
+    echo ''
+
+    echo '--- 5. copy and save files ---'
+    
     dir_name='sv_data/R'${index}/''          # / is included in the dir_name
     mkdir ${dir_name}                        # remember to make the folder first
 
@@ -135,6 +169,9 @@ do
     cp ${name}.log ${dir_name}${name}.log
     cp ${name}.gjf ${dir_name}${name}.gjf
     cp ${name}.cube ${dir_name}${name}.cube
+    cp OrbitalEnergy.csv ${dir_name}OrbitalEnergy.csv
+    echo ''
 
 done < ${datafile}
+
 ```
