@@ -81,7 +81,7 @@ done # end of for R
 ```
 
 - 依次从文件`param_R.csv`中读取之前生成好的随机数R和它的序号，修改.gjf文件，用高斯计算，并进一步生成cube文件。cubegen所需格点参数存在文件`npts`中。然后建立相应的文件夹，把生成的文件存入到制定的文件夹中。
-- 由于R改变的时候会出现能级交叉的现象，所以增加了自动从.log文件中识别sigma轨道是第几个轨道sigmaNo，从而在cubegen参数中`mo=$sigmaNo`确定提取对应的轨道波函数。此外，提取对应轨道的轨道能量存起来。
+- 由于R改变的时候会出现能级交叉的现象，所以增加了自动从.log文件中识别sigma轨道是第几个轨道`sigmaNo`，从而在cubegen参数中`mo=$sigmaNo`确定提取对应的轨道波函数。此外，提取对应轨道的轨道能量存起来。
 
 ```bash
 #!/bin/bash
@@ -130,7 +130,6 @@ do
     echo $energies
     echo ''
 
-
     sym8=$(echo $lineSym | cut -d '(' -f 8)
     sym6=$(echo $lineSym | cut -d '(' -f 6)
 
@@ -151,7 +150,6 @@ do
     echo Orbital energy: $OrbitalEnergy
     echo $OrbitalEnergy >OrbitalEnergy.csv          # write the extracted energy to the file "OrbitalEnergy.csv"
     echo ''  
-
 
     echo '--- 4. genereate .cube ---'
     /opt/software/gaussian09/g09install/G09_Linux_Binary/tar/g09/formchk Gau.chk
