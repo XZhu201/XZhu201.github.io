@@ -23,8 +23,6 @@
 
 ### 写作助手
 
-[Paraphrasing Tool  QuillBot AI](https://quillbot.com/) - 帮助调整语言风格
-
+[Paraphrasing Tool \| QuillBot AI](https://quillbot.com/) - 帮助调整语言风格
 [My Grammarly - Grammarly](https://app.grammarly.com/) - 语法检查
-
-[Academic Phrasebank  Describing methods - Academic Phrasebank (manchester.ac.uk)](https://www.phrasebank.manchester.ac.uk/describing-methods/) - 曼切斯特大学网站，一些代表性的表述方式
+[Academic Phrasebank \| Describing methods - Academic Phrasebank (manchester.ac.uk)](https://www.phrasebank.manchester.ac.uk/describing-methods/) - 曼切斯特大学网站，一些代表性的表述方式
