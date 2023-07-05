@@ -27,6 +27,6 @@
 - [有用的网站](./others/useful_sites/useful_sites.md)
 - [投稿前的checklist](./others/投稿前的checklist/check_before_submition.md)
 
-# Works
+## Works
 
-- [Movie for Fig. 3 for Phys. Rev. Lett. **128**, 030401 (2022)](./Works/Fig3_GPhasePRL/Fig3_GPhasePRL.md)
+- [Movie for Fig. 3 for Phys. Rev. Lett. 128, 030401 (2022)](./Works/Fig3_GPhasePRL/Fig3_GPhasePRL.md)
