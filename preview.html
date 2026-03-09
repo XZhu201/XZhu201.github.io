@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人主页 - 预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .hero-image {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .hero-image p {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #eee;
+            margin: 40px 0;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        .card a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 1.3em;
+        }
+
+        .card p {
+            margin: 0;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+
+        .note {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 15px;
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ 我的个人主页 ✨</h1>
+            <p>记录科研、教学与生活中的点滴思考</p>
+        </div>
+
+        <div class="hero-image">
+            <img src="./figs/lecker_small.jpg" alt="生活照">
+            <p>Schweinshaxe und Bier. 生活与科研，同样精彩。</p>
+        </div>
+
+        <hr>
+
+        <div class="cards-grid">
+            <!-- 研海拾贝卡片 -->
+            <div class="card">
+                <a href="./research/index.md">
+                    <img src="https://picsum.photos/id/8/600/400" alt="研海拾贝">
+                    <div class="card-content">
+                        <h3>🔬 研海拾贝</h3>
+                        <p>记录科研工作中的技术笔记、工具技巧和工作成果</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 大学物理教学卡片 -->
+            <div class="card">
+                <a href="./teaching/index.md">
+                    <img src="https://picsum.photos/id/20/600/400" alt="大学物理教学">
+                    <div class="card-content">
+                        <h3>📚 大学物理教学</h3>
+                        <p>大学物理课程资料、知识点讲解、习题解析</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 数理趣谈卡片 -->
+            <div class="card">
+                <a href="./popular/index.md">
+                    <img src="https://picsum.photos/id/1073/600/400" alt="数理趣谈">
+                    <div class="card-content">
+                        <h3>✨ 数理趣谈</h3>
+                        <p>有趣的数学、物理小知识和趣味故事，领略科学魅力</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="note">
+            💡 这是预览效果，如果满意我就把这个样式应用到GitHub Pages上，卡片的图片你后续可以替换为自己喜欢的图片。
+        </div>
+    </div>
+</body>
+</html>
