@@ -1,52 +1,22 @@
----
-layout: default
-title: 我的个人主页
----
+# 这里记录了我的一些笔记！
 
-<div align="center" style="margin: 30px 0;">
-  <h1>✨ 我的个人主页 ✨</h1>
-  <p>记录科研、教学与生活中的点滴思考</p>
-</div>
+![lecker](./figs/lecker_small.jpg)
+*Schweinshaxe und Bier.*
 
-<hr>
+## 🔬 研海拾贝（科研相关）
 
-<table style="width: 100%; max-width: 800px; margin: 0 auto; border-collapse: separate; border-spacing: 20px;">
-  <tr>
-    <!-- 研海拾贝 -->
-    <td style="width: 50%; border: none; background: white; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
-      <a href="./research/index.md" style="text-decoration: none; color: inherit;">
-        <img src="https://picsum.photos/id/8/600/300" alt="研海拾贝" style="width: 100%; display: block;">
-        <div style="padding: 15px;">
-          <h3 style="margin: 0 0 8px 0; color: #333;">🔬 研海拾贝</h3>
-          <p style="margin: 0; color: #666; font-size: 0.95em; line-height: 1.4;">记录科研工作中的技术笔记、工具技巧和工作成果</p>
-        </div>
-      </a>
-    </td>
-    <!-- 数理天地 -->
-    <td style="width: 50%; border: none; background: white; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
-      <a href="./shuli/index.md" style="text-decoration: none; color: inherit;">
-        <img src="https://picsum.photos/id/20/600/300" alt="数理天地" style="width: 100%; display: block;">
-        <div style="padding: 15px;">
-          <h3 style="margin: 0 0 8px 0; color: #333;">✨ 数理天地</h3>
-          <p style="margin: 0; color: #666; font-size: 0.95em; line-height: 1.4;">包含大学物理教学内容和有趣的数理科普知识</p>
-        </div>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <!-- 个人照片 -->
-    <td colspan="2" style="border: none; background: white; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1);">
-      <img src="./figs/lecker_small.jpg" alt="生活照" style="width: 100%; display: block;">
-      <div style="padding: 15px; text-align: center;">
-        <p style="margin: 0; font-style: italic; color: #666;">Schweinshaxe und Bier.</p>
-        <p style="margin: 5px 0 0 0; color: #888; font-size: 0.9em;">生活与科研，同样精彩</p>
-      </div>
-    </td>
-  </tr>
-</table>
+- [Linux小技巧合集](./research/index.md#Linux小技巧)
+- [Matlab小技巧合集](./research/index.md#Matlab小技巧)
+- [Mathematica小技巧合集](./research/index.md#Mathematica小技巧)
+- [工作成果展示](./research/index.md#工作成果)
+- [其他科研参考资料](./research/index.md#其他参考)
 
-<br>
-<hr>
-<br>
+## ✨ 数理天地（教学+科普）
 
-> 提示：所有卡片图片都可以后续替换为自己喜欢的本地图片。
+- [大学物理教学内容](./shuli/index.md#大学物理教学)
+- [数理科普趣闻](./shuli/index.md#数理趣谈)
+
+## 📁 内容分类说明
+
+- **研海拾贝**：包含所有科研工作相关的技术笔记、工具使用技巧、论文投稿经验、已发表工作成果等
+- **数理天地**：包含大学物理课程教学资料、知识点讲解，以及有趣的数学、物理科普知识和趣味故事
