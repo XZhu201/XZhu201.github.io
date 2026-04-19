@@ -1,7 +1,7 @@
-# 这里记录了我的一些笔记！
+# 学习、研究与零碎收获
 
 ![lecker](./figs/lecker_small.jpg)
-*Schweinshaxe und Bier.*
+*Schweinshaxe und Bier. 生活与科研，同样精彩。*
 
 ---
 
