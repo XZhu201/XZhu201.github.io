@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抗磁性的微观图像</title>
+    <style>
+        :root {
+            --paper: #f7f1e6;
+            --paper-strong: #efe4cf;
+            --ink: #203247;
+            --muted: #5f6f7f;
+            --blue: #2a6f97;
+            --blue-soft: #bfd8eb;
+            --copper: #bf5b2c;
+            --copper-soft: #f2c8ac;
+            --red: #bc4749;
+            --green: #4d7c5a;
+            --panel: rgba(255, 252, 245, 0.88);
+            --line: rgba(32, 50, 71, 0.15);
+            --shadow: 0 18px 50px rgba(32, 50, 71, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(42, 111, 151, 0.14), transparent 30%),
+                radial-gradient(circle at top right, rgba(191, 91, 44, 0.12), transparent 28%),
+                linear-gradient(180deg, #fcfaf4 0%, #f4ecde 100%);
+        }
+
+        .page {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 28px 18px 32px;
+        }
+
+        .hero {
+            background: var(--panel);
+            border: 1px solid rgba(42, 111, 151, 0.12);
+            border-radius: 24px;
+            padding: 28px 28px 22px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 0.36rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(42, 111, 151, 0.1);
+            color: var(--blue);
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        h1 {
+            margin: 14px 0 10px;
+            font-family: "Source Han Serif SC", "Noto Serif SC", "STSong", serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.15;
+            letter-spacing: 0.01em;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 900px;
+            font-size: 1.02rem;
+            line-height: 1.75;
+            color: var(--muted);
+        }
+
+        .hero-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .mini-card {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 241, 230, 0.86));
+            border: 1px solid rgba(32, 50, 71, 0.08);
+        }
+
+        .mini-card strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.98rem;
+        }
+
+        .mini-card span {
+            display: block;
+            line-height: 1.65;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .controls {
+            margin-top: 20px;
+            padding: 18px 20px;
+            border-radius: 20px;
+            background: rgba(255, 252, 245, 0.92);
+            border: 1px solid rgba(32, 50, 71, 0.08);
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 16px 20px;
+            align-items: center;
+        }
+
+        .button-row,
+        .slider-row,
+        .status-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 0.96rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(32, 50, 71, 0.15);
+        }
+
+        .primary {
+            background: var(--blue);
+            color: white;
+        }
+
+        .secondary {
+            background: #e7edf3;
+            color: var(--ink);
+        }
+
+        .accent {
+            background: var(--copper);
+            color: white;
+        }
+
+        .slider-row label {
+            min-width: 72px;
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            min-width: 180px;
+            accent-color: var(--copper);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.46rem 0.85rem;
+            border-radius: 999px;
+            background: rgba(42, 111, 151, 0.1);
+            color: var(--blue);
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .scene-grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(32, 50, 71, 0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-head {
+            padding: 18px 20px 8px;
+        }
+
+        .panel-head h2 {
+            margin: 0 0 4px;
+            font-size: 1.16rem;
+        }
+
+        .panel-head p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(239, 228, 207, 0.42)),
+                linear-gradient(90deg, rgba(42, 111, 151, 0.04), rgba(191, 91, 44, 0.05));
+            border-top: 1px solid rgba(32, 50, 71, 0.07);
+        }
+
+        .panel-note {
+            padding: 12px 20px 18px;
+            color: var(--muted);
+            line-height: 1.72;
+            font-size: 0.94rem;
+        }
+
+        .wide {
+            grid-column: 1 / -1;
+        }
+
+        .footer-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .footer-card {
+            background: rgba(255, 252, 245, 0.92);
+            border: 1px solid rgba(32, 50, 71, 0.08);
+            border-radius: 20px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .footer-card strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .footer-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.72;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 900px) {
+            .controls,
+            .scene-grid,
+            .hero-grid,
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <section class="hero">
+            <span class="eyebrow">大学物理教学示意动画</span>
+            <h1>抗磁性的微观图像</h1>
+            <p>本页展示轨道磁矩 <code>pₘ</code> 与轨道角动量 <code>L</code> 的方向关系，外磁场作用下的力矩 <code>M</code> 与进动，以及附加磁矩 <code>Δpₘ</code> 的方向。</p>
+            <div class="hero-grid">
+                <div class="mini-card">
+                    <strong>两种初始情形</strong>
+                    <span>左栏与右栏分别表示原轨道磁矩有向上分量和向下分量。</span>
+                </div>
+                <div class="mini-card">
+                    <strong>两种运动</strong>
+                    <span>电子绕核运动较快，轨道法线绕 <code>B0</code> 的进动较慢。</span>
+                </div>
+                <div class="mini-card">
+                    <strong>本页结论</strong>
+                    <span>两种初始取向都对应反向于 <code>B0</code> 的附加磁矩 <code>Δpₘ</code>。</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="controls">
+            <div class="button-row">
+                <button id="playBtn" class="primary">暂停动画</button>
+                <button id="fieldBtn" class="accent">关闭外磁场</button>
+                <button id="resetBtn" class="secondary">重置时间</button>
+            </div>
+            <div class="slider-row">
+                <label for="fieldStrength">场强</label>
+                <input id="fieldStrength" type="range" min="0" max="100" value="72">
+                <span id="fieldValue" class="badge">0.72</span>
+                <label class="checkbox">
+                    <input id="traceToggle" type="checkbox" checked>
+                    显示进动轨迹
+                </label>
+            </div>
+            <div class="status-row">
+                <span id="statusField" class="badge">外磁场已打开</span>
+                <span id="statusSummary" class="badge">Δpₘ 反向于 B0</span>
+            </div>
+            <div class="status-row">
+                <span class="badge">蓝色箭头: 外磁场 B0</span>
+                <span class="badge">橙色箭头: 磁矩 pₘ</span>
+                <span class="badge">紫色箭头: 角动量 L</span>
+                <span class="badge">深绿色直箭头: 外力矩 M（也是进动方向）</span>
+                <span class="badge">红色箭头: 附加磁矩 Δpₘ</span>
+            </div>
+        </section>
+
+        <section class="scene-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <h2>情形 A：原轨道磁矩有向上分量</h2>
+                    <p>图中给出 <code>pₘ</code>、<code>L</code>、<code>M</code> 的方向。对电子轨道，<code>pₘ</code> 与 <code>L</code> 方向相反。</p>
+                </div>
+                <canvas id="caseA" width="560" height="390"></canvas>
+                <div class="panel-note"><code>pₘ</code>、<code>L</code>、<code>M</code></div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <h2>情形 B：原轨道磁矩有向下分量</h2>
+                    <p>改变初始取向后，再比较 <code>pₘ</code>、<code>L</code>、<code>M</code> 的方向关系。</p>
+                </div>
+                <canvas id="caseB" width="560" height="390"></canvas>
+                <div class="panel-note"><code>pₘ</code>、<code>L</code>、<code>M</code></div>
+            </article>
+
+            <article class="panel wide">
+                <div class="panel-head">
+                    <h2>共同结果：附加磁矩反向于 B0</h2>
+                    <p>轨道法线的进动可等效为绕外场轴的附加环流。两种情形都得到反向于 <code>B0</code> 的 <code>Δpₘ</code>。</p>
+                </div>
+                <canvas id="summary" width="1120" height="330"></canvas>
+                <div class="panel-note">电子带负电，电子运动方向与等效电流方向相反。</div>
+            </article>
+        </section>
+
+        <section class="footer-grid">
+            <div class="footer-card">
+                <strong><code>B = 0</code></strong>
+                <p>没有外场作用时，不出现由进动产生的附加磁矩 <code>Δpₘ</code>。</p>
+            </div>
+            <div class="footer-card">
+                <strong>场强变化</strong>
+                <p>场强增大时，进动加快，附加磁矩 <code>Δpₘ</code> 的示意长度增大。</p>
+            </div>
+            <div class="footer-card">
+                <strong>图像说明</strong>
+                <p>图中轨道用于表示方向关系，不表示精确量子态。</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const TAU = Math.PI * 2;
+
+        const state = {
+            running: true,
+            fieldOn: true,
+            fieldStrength: 0.72,
+            showTrace: true,
+            time: 0
+        };
+
+        const views = {
+            caseA: {
+                canvas: document.getElementById("caseA"),
+                theta: Math.PI * 0.34,
+                phi0: -0.78,
+                electronDir: 1,
+                label: "情形 A"
+            },
+            caseB: {
+                canvas: document.getElementById("caseB"),
+                theta: Math.PI * 0.70,
+                phi0: 0.95,
+                electronDir: -1,
+                label: "情形 B"
+            },
+            summary: {
+                canvas: document.getElementById("summary")
+            }
+        };
+
+        const playBtn = document.getElementById("playBtn");
+        const fieldBtn = document.getElementById("fieldBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const fieldStrength = document.getElementById("fieldStrength");
+        const fieldValue = document.getElementById("fieldValue");
+        const traceToggle = document.getElementById("traceToggle");
+        const statusField = document.getElementById("statusField");
+        const statusSummary = document.getElementById("statusSummary");
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function hasActiveField() {
+            return state.fieldOn && state.fieldStrength > 0.001;
+        }
+
+        function vec(x, y, z) {
+            return { x, y, z };
+        }
+
+        function add(a, b) {
+            return vec(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
+
+        function sub(a, b) {
+            return vec(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
+
+        function scale(v, s) {
+            return vec(v.x * s, v.y * s, v.z * s);
+        }
+
+        function cross(a, b) {
+            return vec(
+                a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
+                a.x * b.y - a.y * b.x
+            );
+        }
+
+        function length(v) {
+            return Math.hypot(v.x, v.y, v.z);
+        }
+
+        function normalize(v) {
+            const len = length(v) || 1;
+            return scale(v, 1 / len);
+        }
+
+        function project(point, center, scaleValue) {
+            return {
+                x: center.x + scaleValue * (point.x + point.z * 0.42),
+                y: center.y - scaleValue * (point.y - point.z * 0.18),
+                depth: point.z
+            };
+        }
+
+        function buildBasis(normal) {
+            const helper = Math.abs(normal.y) < 0.92 ? vec(0, 1, 0) : vec(1, 0, 0);
+            const u = normalize(cross(normal, helper));
+            const v = normalize(cross(normal, u));
+            return { u, v };
+        }
+
+        function getNormal(theta, phi) {
+            return normalize(vec(
+                Math.sin(theta) * Math.cos(phi),
+                Math.cos(theta),
+                Math.sin(theta) * Math.sin(phi)
+            ));
+        }
+
+        function drawArrow(ctx, start, end, color, width, head = 12) {
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const angle = Math.atan2(dy, dx);
+
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(end.x, end.y);
+            ctx.lineTo(end.x - head * Math.cos(angle - Math.PI / 7), end.y - head * Math.sin(angle - Math.PI / 7));
+            ctx.lineTo(end.x - head * Math.cos(angle + Math.PI / 7), end.y - head * Math.sin(angle + Math.PI / 7));
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawLabel(ctx, text, x, y, options = {}) {
+            ctx.save();
+            ctx.font = options.font || "600 15px 'Microsoft YaHei'";
+            ctx.fillStyle = options.color || "#203247";
+            ctx.textAlign = options.align || "left";
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+
+        function drawCurvedArrow(ctx, centerX, centerY, radius, startAngle, endAngle, color, width) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineCap = "round";
+            ctx.stroke();
+
+            const endX = centerX + radius * Math.cos(endAngle);
+            const endY = centerY + radius * Math.sin(endAngle);
+            const tangentAngle = endAngle + Math.PI / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - 12 * Math.cos(tangentAngle - Math.PI / 7), endY - 12 * Math.sin(tangentAngle - Math.PI / 7));
+            ctx.lineTo(endX - 12 * Math.cos(tangentAngle + Math.PI / 7), endY - 12 * Math.sin(tangentAngle + Math.PI / 7));
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawOrbitScene(view, elapsed) {
+            const canvas = view.canvas;
+            const ctx = canvas.getContext("2d");
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const center = { x: w * 0.42, y: h * 0.58 };
+            const scaleValue = 108;
+            const orbitRadius = 1.12;
+            const activeField = hasActiveField();
+            const omega = activeField ? state.fieldStrength * 0.45 : 0;
+            const phi = view.phi0 - omega * elapsed;
+            const normal = getNormal(view.theta, phi);
+            const basis = buildBasis(normal);
+
+            drawLabel(ctx, activeField ? "轨道法线绕 B0 进动" : "场强为 0，不发生进动", 20, 32, {
+                color: activeField ? "#2a6f97" : "#5f6f7f",
+                font: "700 16px 'Microsoft YaHei'"
+            });
+
+            if (state.fieldOn) {
+                const axisStart = project(vec(0, -1.45, 0), center, scaleValue);
+                const axisEnd = project(vec(0, 1.55, 0), center, scaleValue);
+                drawArrow(ctx, axisStart, axisEnd, "#2a6f97", 4, 14);
+                drawLabel(ctx, "B0", axisEnd.x + 10, axisEnd.y - 2, { color: "#2a6f97", font: "700 16px 'Microsoft YaHei'" });
+            } else {
+                ctx.save();
+                ctx.setLineDash([8, 8]);
+                const axisStart = project(vec(0, -1.45, 0), center, scaleValue);
+                const axisEnd = project(vec(0, 1.55, 0), center, scaleValue);
+                ctx.beginPath();
+                ctx.moveTo(axisStart.x, axisStart.y);
+                ctx.lineTo(axisEnd.x, axisEnd.y);
+                ctx.strokeStyle = "rgba(42, 111, 151, 0.22)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+                drawLabel(ctx, "B0 轴只作参照", axisEnd.x + 10, axisEnd.y - 2, { color: "#7a8896" });
+            }
+
+            if (activeField && state.showTrace) {
+                ctx.beginPath();
+                for (let i = 0; i <= 90; i++) {
+                    const samplePhi = phi + i * 0.06;
+                    const sampleN = getNormal(view.theta, samplePhi);
+                    const tip = project(scale(sampleN, 1.15), center, scaleValue);
+                    if (i === 0) {
+                        ctx.moveTo(tip.x, tip.y);
+                    } else {
+                        ctx.lineTo(tip.x, tip.y);
+                    }
+                }
+                ctx.strokeStyle = "rgba(191, 91, 44, 0.28)";
+                ctx.lineWidth = 5;
+                ctx.lineCap = "round";
+                ctx.stroke();
+            }
+
+            const orbitPoints = [];
+            for (let i = 0; i <= 160; i++) {
+                const angle = (i / 160) * TAU;
+                const point3d = add(scale(basis.u, orbitRadius * Math.cos(angle)), scale(basis.v, orbitRadius * Math.sin(angle)));
+                orbitPoints.push(project(point3d, center, scaleValue));
+            }
+
+            ctx.beginPath();
+            orbitPoints.forEach((point, index) => {
+                if (index === 0) {
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                }
+            });
+            ctx.closePath();
+            ctx.fillStyle = "rgba(42, 111, 151, 0.07)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(42, 111, 151, 0.68)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            const pmTip = project(scale(normal, 1.15), center, scaleValue);
+            drawArrow(ctx, center, pmTip, "#bf5b2c", 4, 14);
+            drawLabel(ctx, "p_m", pmTip.x + 10, pmTip.y + 4, {
+                color: "#bf5b2c",
+                font: "700 16px 'Microsoft YaHei'"
+            });
+
+            const lTip = project(scale(normal, -1.05), center, scaleValue);
+            drawArrow(ctx, center, lTip, "#6f58c9", 4, 14);
+            drawLabel(ctx, "L", lTip.x + 10, lTip.y + 4, {
+                color: "#6f58c9",
+                font: "700 16px 'Microsoft YaHei'"
+            });
+
+            if (activeField) {
+                const mStart = project(scale(getNormal(view.theta, phi + 0.28), 1.28), center, scaleValue);
+                const mEnd = project(scale(getNormal(view.theta, phi - 0.04), 1.28), center, scaleValue);
+                drawArrow(ctx, mStart, mEnd, "#4d7c5a", 7, 18);
+                drawLabel(ctx, "M", mEnd.x + 12, mEnd.y + 6, {
+                    color: "#4d7c5a",
+                    font: "700 20px 'Microsoft YaHei'"
+                });
+            }
+
+            const electronAngle = elapsed * 2.25 * view.electronDir;
+            const electron3d = add(
+                scale(basis.u, orbitRadius * Math.cos(electronAngle)),
+                scale(basis.v, orbitRadius * Math.sin(electronAngle))
+            );
+            const electron = project(electron3d, center, scaleValue);
+
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 14, 0, TAU);
+            ctx.fillStyle = "#d7b264";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(99, 70, 23, 0.4)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            drawLabel(ctx, "核", center.x, center.y + 5, { color: "#6f5518", align: "center", font: "700 14px 'Microsoft YaHei'" });
+
+            ctx.beginPath();
+            ctx.arc(electron.x, electron.y, 8.5, 0, TAU);
+            ctx.fillStyle = "#bc4749";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.9)";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(electron.x, electron.y, 16, 0, TAU);
+            ctx.fillStyle = "rgba(188, 71, 73, 0.15)";
+            ctx.fill();
+
+            drawLabel(ctx, "电子绕核运动", 24, h - 44, { color: "#bc4749", font: "700 15px 'Microsoft YaHei'" });
+            drawLabel(ctx, activeField ? "轨道法线绕 B0 进动" : "轨道法线不进动", 24, h - 20, {
+                color: activeField ? "#bf5b2c" : "#7a8896",
+                font: "700 15px 'Microsoft YaHei'"
+            });
+        }
+
+        function drawEquivalentLoop(ctx, centerX, centerY, title) {
+            const loopRx = 78;
+            const loopRy = 24;
+            const activeField = hasActiveField();
+            const induced = activeField ? state.fieldStrength * 0.82 : 0;
+            const phase = state.time * (activeField ? state.fieldStrength * 0.46 : 0);
+
+            drawLabel(ctx, title, centerX, 58, {
+                align: "center",
+                font: "700 17px 'Microsoft YaHei'"
+            });
+
+            drawArrow(
+                ctx,
+                { x: centerX, y: centerY + 70 },
+                { x: centerX, y: centerY - 78 },
+                "#2a6f97",
+                5,
+                15
+            );
+            drawLabel(ctx, "B0", centerX + 14, centerY - 70, {
+                color: "#2a6f97",
+                font: "700 16px 'Microsoft YaHei'"
+            });
+
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY, loopRx, loopRy, 0, 0, TAU);
+            ctx.strokeStyle = "rgba(191, 91, 44, 0.9)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            const dotX = centerX + loopRx * Math.cos(phase);
+            const dotY = centerY + loopRy * Math.sin(phase);
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, 7, 0, TAU);
+            ctx.fillStyle = "#bf5b2c";
+            ctx.fill();
+
+            drawArrow(
+                ctx,
+                { x: centerX + 20, y: centerY - loopRy - 10 },
+                { x: centerX + 54, y: centerY - loopRy + 10 },
+                "#bf5b2c",
+                3,
+                10
+            );
+            drawLabel(ctx, "附加环流", centerX, centerY + 58, {
+                align: "center",
+                color: "#bf5b2c",
+                font: "700 15px 'Microsoft YaHei'"
+            });
+
+            drawArrow(
+                ctx,
+                { x: centerX, y: centerY + 10 },
+                { x: centerX, y: centerY + 10 + 78 * induced },
+                "#bc4749",
+                5,
+                15
+            );
+            drawLabel(ctx, activeField ? "Δp_m 向下" : "Δp_m = 0", centerX + 18, centerY + 30 + 70 * induced, {
+                color: "#bc4749",
+                font: "700 16px 'Microsoft YaHei'"
+            });
+        }
+
+        function drawSummary() {
+            const canvas = views.summary.canvas;
+            const ctx = canvas.getContext("2d");
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            drawEquivalentLoop(ctx, w * 0.28, h * 0.56, "由情形 A 导出的附加环流");
+            drawEquivalentLoop(ctx, w * 0.72, h * 0.56, "由情形 B 导出的附加环流");
+
+            ctx.beginPath();
+            ctx.moveTo(w / 2, 78);
+            ctx.lineTo(w / 2, h - 34);
+            ctx.strokeStyle = "rgba(32, 50, 71, 0.12)";
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 10]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            drawLabel(ctx, hasActiveField() ? "两边的 Δp_m 都反向于 B0" : "场强为 0 时，Δp_m = 0", w / 2, h - 16, {
+                align: "center",
+                color: hasActiveField() ? "#bc4749" : "#7a8896",
+                font: "700 18px 'Microsoft YaHei'"
+            });
+        }
+
+        function updateUi() {
+            const activeField = hasActiveField();
+            playBtn.textContent = state.running ? "暂停动画" : "继续动画";
+            fieldBtn.textContent = state.fieldOn ? "关闭外磁场" : "加入外磁场";
+            fieldValue.textContent = state.fieldStrength.toFixed(2);
+            statusField.textContent = state.fieldOn ? "外磁场已打开" : "外磁场已关闭";
+            statusSummary.textContent = activeField ? "Δpₘ 反向于 B0" : "场强为 0";
+        }
+
+        function render() {
+            drawOrbitScene(views.caseA, state.time);
+            drawOrbitScene(views.caseB, state.time + 0.55);
+            drawSummary();
+        }
+
+        function tick() {
+            if (state.running) {
+                state.time += 0.016;
+            }
+            render();
+            requestAnimationFrame(tick);
+        }
+
+        playBtn.addEventListener("click", () => {
+            state.running = !state.running;
+            updateUi();
+        });
+
+        fieldBtn.addEventListener("click", () => {
+            state.fieldOn = !state.fieldOn;
+            updateUi();
+        });
+
+        resetBtn.addEventListener("click", () => {
+            state.time = 0;
+            render();
+        });
+
+        fieldStrength.addEventListener("input", (event) => {
+            state.fieldStrength = clamp(Number(event.target.value) / 100, 0, 1);
+            updateUi();
+        });
+
+        traceToggle.addEventListener("change", (event) => {
+            state.showTrace = event.target.checked;
+            render();
+        });
+
+        updateUi();
+        render();
+        requestAnimationFrame(tick);
+    </script>
+</body>
+</html>
