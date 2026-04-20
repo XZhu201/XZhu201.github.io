@@ -219,14 +219,14 @@
 
             <div class="control-group">
                 <label for="rotationSpeed">旋转速度:</label>
-                <input type="range" id="rotationSpeed" min="0.1" max="2" step="0.1" value="0.5">
-                <span class="value-display" id="rotationSpeedValue">0.5</span>
+                <input type="range" id="rotationSpeed" min="0.02" max="0.6" step="0.02" value="0.2">
+                <span class="value-display" id="rotationSpeedValue">0.20</span>
             </div>
 
             <div class="control-group">
                 <label for="ballSpeed">小球速度:</label>
-                <input type="range" id="ballSpeed" min="1" max="10" step="0.5" value="5">
-                <span class="value-display" id="ballSpeedValue">5</span>
+                <input type="range" id="ballSpeed" min="0.8" max="6" step="0.2" value="3">
+                <span class="value-display" id="ballSpeedValue">3.0</span>
             </div>
 
             <div class="control-group">
@@ -271,12 +271,13 @@
         const CANVAS_SIZE = 400;
         const CENTER = CANVAS_SIZE / 2;
         const EARTH_RADIUS = 180;
+        const SIMULATION_SUBSTEPS = 12;
 
         // 状态变量
         let isRunning = false;
         let rotationAngle = 0;
-        let rotationSpeed = 0.5; // 弧度/帧
-        let ballSpeed = 5;
+        let rotationSpeed = 0.2; // 弧度/帧
+        let ballSpeed = 3;
         let isNorthernHemisphere = true;
         let animationId = null;
 
@@ -311,8 +312,9 @@
                 y: CENTER,
                 vx: Math.cos(angle) * ballSpeed,
                 vy: Math.sin(angle) * ballSpeed,
+                isActive: true,
                 trail: [],
-                maxTrailLength: 500, // 足够长的轨迹
+                maxTrailLength: 4000, // 更高的采样密度，避免右图轨迹出现明显折线
                 color: `hsl(${Math.random() * 360}, 85%, 55%)` // 更鲜艳的颜色
             };
             // 添加初始轨迹点，记录当前旋转角度
@@ -387,7 +389,7 @@
                 drawTrail = ball.trail.map(point => {
                     // 计算这个点产生时，地球已经旋转了point.rotationAngle角度
                     // 所以在旋转参考系中看到的位置 = 原始位置 反向旋转 point.rotationAngle角度
-                    const rotationOffset = isNorthernHemisphere ? point.rotationAngle : -point.rotationAngle;
+                    const rotationOffset = point.rotationAngle;
                     const cos = Math.cos(-rotationOffset);
                     const sin = Math.sin(-rotationOffset);
 
@@ -400,7 +402,7 @@
                 });
 
                 // 转换当前小球位置
-                const currentRotation = isNorthernHemisphere ? rotationAngle : -rotationAngle;
+                const currentRotation = rotationAngle;
                 const cos = Math.cos(-currentRotation);
                 const sin = Math.sin(-currentRotation);
                 const dx = ball.x - CENTER;
@@ -435,8 +437,13 @@
                 ctx.globalCompositeOperation = 'source-over';
             }
 
+            // 到达边缘后隐藏球体，只保留已经形成的轨迹
+            if (!ball.isActive) {
+                return;
+            }
             // 绘制小球
             ctx.beginPath();
+            ctx.fillStyle = ball.color;
             ctx.arc(drawX, drawY, 8, 0, Math.PI * 2); // 更大的小球
             ctx.fillStyle = ball.color;
             ctx.fill();
@@ -446,10 +453,10 @@
         }
 
         // 更新小球位置
-        function updateBalls() {
+        function updateBalls(stepScale = 1) {
             balls.forEach(ball => {
                 // 只有在运动时才更新位置和添加轨迹
-                if (ball.vx !== 0 || ball.vy !== 0) {
+                if (ball.isActive && (ball.vx !== 0 || ball.vy !== 0)) {
                     // 保存当前位置和当前旋转角度到轨迹
                     ball.trail.push({
                         x: ball.x,
@@ -461,19 +468,20 @@
                     }
 
                     // 更新位置（直线运动，在惯性系中）
-                    ball.x += ball.vx;
-                    ball.y += ball.vy;
+                    ball.x += ball.vx * stepScale;
+                    ball.y += ball.vy * stepScale;
                 }
             });
 
-            // 小球碰到边界后停止运动，不再消失
+            // 小球碰到边界后从画面上消失，不再停留在圆边
             balls.forEach(ball => {
                 const dx = ball.x - CENTER;
                 const dy = ball.y - CENTER;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance >= EARTH_RADIUS - 6) { // 碰到地球边缘
+                if (ball.isActive && distance >= EARTH_RADIUS - 6) { // 碰到地球边缘
                     ball.vx = 0;
                     ball.vy = 0;
+                    ball.isActive = false;
                 }
             });
         }
@@ -496,8 +504,11 @@
 
             // 如果正在运行，更新角度和小球
             if (isRunning) {
-                rotationAngle += rotationSpeed * (isNorthernHemisphere ? 1 : -1);
-                updateBalls();
+                const stepScale = 1 / SIMULATION_SUBSTEPS;
+                for (let i = 0; i < SIMULATION_SUBSTEPS; i++) {
+                    rotationAngle += rotationSpeed * stepScale * (isNorthernHemisphere ? -1 : 1);
+                    updateBalls(stepScale);
+                }
             }
 
             animationId = requestAnimationFrame(draw);
@@ -530,7 +541,7 @@
 
         rotationSpeedSlider.addEventListener('input', (e) => {
             rotationSpeed = parseFloat(e.target.value);
-            rotationSpeedValue.textContent = rotationSpeed.toFixed(1);
+            rotationSpeedValue.textContent = rotationSpeed.toFixed(2);
         });
 
         ballSpeedSlider.addEventListener('input', (e) => {

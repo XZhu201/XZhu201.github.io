@@ -1,4 +1,4 @@
-# 学习、研究与零碎收获
+# 学习、研究与点滴收获
 
 ![lecker](./figs/lecker_small.jpg)
 *Schweinshaxe und Bier. 生活与科研，同样精彩。*

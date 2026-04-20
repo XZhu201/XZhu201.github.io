@@ -577,11 +577,16 @@
             }
 
             if (activeField && state.showTrace) {
+                const traceCenter = project(scale(normal, -1.18), center, scaleValue);
                 ctx.beginPath();
                 for (let i = 0; i <= 90; i++) {
                     const samplePhi = phi + i * 0.06;
-                    const sampleN = getNormal(view.theta, samplePhi);
-                    const tip = project(scale(sampleN, 1.15), center, scaleValue);
+                    const sampleL = scale(getNormal(view.theta, samplePhi), -1.18);
+                    const rawTip = project(sampleL, center, scaleValue);
+                    const tip = {
+                        x: rawTip.x,
+                        y: traceCenter.y + (rawTip.y - traceCenter.y) * 0.55
+                    };
                     if (i === 0) {
                         ctx.moveTo(tip.x, tip.y);
                     } else {
@@ -631,8 +636,8 @@
             });
 
             if (activeField) {
-                const mStart = project(scale(getNormal(view.theta, phi + 0.28), 1.28), center, scaleValue);
-                const mEnd = project(scale(getNormal(view.theta, phi - 0.04), 1.28), center, scaleValue);
+                const mStart = project(scale(getNormal(view.theta, phi + 0.28), -1.24), center, scaleValue);
+                const mEnd = project(scale(getNormal(view.theta, phi - 0.04), -1.24), center, scaleValue);
                 drawArrow(ctx, mStart, mEnd, "#4d7c5a", 7, 18);
                 drawLabel(ctx, "M", mEnd.x + 12, mEnd.y + 6, {
                     color: "#4d7c5a",
