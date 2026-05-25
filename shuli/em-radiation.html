@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电磁波辐射 - 空间结构</title>
+    <!-- KaTeX for formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 400px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+            max-height: calc(100% - 40px);
+            overflow-y: auto;
+        }
+        .control-panel h1 {
+            font-size: 1.25rem;
+            margin: 0 0 16px 0;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        .description {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .formula-box {
+            background: rgba(241, 245, 249, 0.8);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            overflow-x: auto;
+        }
+        .control-group {
+            margin-bottom: 14px;
+        }
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #334155;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+        }
+        .control-group input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .radio-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .radio-label {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #334155;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .radio-label:hover {
+            background: #e2e8f0;
+        }
+        .radio-label input {
+            display: none;
+        }
+        .radio-label.active {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1d4ed8;
+            font-weight: 500;
+        }
+        .legend {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .color-box {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+        .color-e { background-color: #ef4444; }
+        .color-h { background-color: #3b82f6; }
+        
+        .direction-controls {
+            display: none;
+            background: rgba(241, 245, 249, 0.5);
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .direction-controls.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .interaction-hint {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            opacity: 0.9;
+            animation: fadeOut 5s forwards;
+            animation-delay: 3s;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="simCanvas"></canvas>
+    </div>
+
+    <div class="interaction-hint">
+        左右拖拽水平自转，上下拖拽调整俯仰角
+    </div>
+
+    <div class="control-panel">
+        <h1>电偶极子辐射</h1>
+        <div class="description">
+            中心偶极子沿 Z 轴振荡。通过切换模式或自定义射线方向，观察电磁波参数随方向角 $\theta$ 的变化规律（轴向无辐射，赤道最强）。
+        </div>
+
+        <div class="control-group">
+            <label style="margin-bottom:12px;">观察模式</label>
+            <div class="radio-group" id="mode-group">
+                <label class="radio-label active">
+                    <input type="radio" name="viewMode" value="custom" checked> 自定义方向
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="viewMode" value="equator"> 赤道平面
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="viewMode" value="meridian"> 子午面
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="viewMode" value="full"> 空间分布
+                </label>
+            </div>
+        </div>
+
+        <div class="direction-controls active" id="dir-controls">
+            <div class="control-group">
+                <label>
+                    <span>极角 $\theta$ (与z轴夹角)</span>
+                    <span id="theta-val">90°</span>
+                </label>
+                <input type="range" id="theta-slider" min="0" max="180" step="1" value="90">
+            </div>
+            <div class="control-group">
+                <label>
+                    <span>方位角 $\phi$ (在xy面投影)</span>
+                    <span id="phi-val">0°</span>
+                </label>
+                <input type="range" id="phi-slider" min="0" max="360" step="1" value="0">
+            </div>
+        </div>
+
+        <div class="formula-box">
+            $$ E_m = \frac{\omega^2 p_m \sin\theta}{4\pi\varepsilon u^2 r} $$
+            $$ H_m = \frac{\omega^2 p_m \sin\theta}{4\pi u r} $$
+        </div>
+
+        <div class="control-group">
+            <label>
+                <span>振荡频率 $\omega$</span>
+                <span id="freq-val">1.0</span>
+            </label>
+            <input type="range" id="freq-slider" min="0.2" max="3" step="0.1" value="1.0">
+        </div>
+
+        <div class="control-group">
+            <label>
+                <span>波长 $\lambda$</span>
+                <span id="lambda-val">2.0</span>
+            </label>
+            <input type="range" id="lambda-slider" min="0.5" max="4.0" step="0.1" value="2.0">
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="color-box color-e"></div> 电场 $\vec{E}$ (沿经线切向)</div>
+            <div class="legend-item"><div class="color-box color-h"></div> 磁场 $\vec{H}$ (沿纬线切向)</div>
+        </div>
+    </div>
+
+    <script>
+        let viewMode = 'custom';
+        let customTheta = 90;
+        let customPhi = 0;
+
+        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                viewMode = e.target.value;
+                document.querySelectorAll('.radio-label').forEach(lbl => lbl.classList.remove('active'));
+                e.target.parentElement.classList.add('active');
+                
+                if (viewMode === 'custom') {
+                    document.getElementById('dir-controls').classList.add('active');
+                } else {
+                    document.getElementById('dir-controls').classList.remove('active');
+                }
+            });
+        });
+
+        document.getElementById('theta-slider').addEventListener('input', e => {
+            customTheta = parseInt(e.target.value);
+            document.getElementById('theta-val').innerText = customTheta + '°';
+        });
+        document.getElementById('phi-slider').addEventListener('input', e => {
+            customPhi = parseInt(e.target.value);
+            document.getElementById('phi-val').innerText = customPhi + '°';
+        });
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height, cx, cy;
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width * window.devicePixelRatio;
+            canvas.height = height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            cx = width / 2;
+            cy = height / 2;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let rotX = 0.2; 
+        let rotY = -0.5; 
+        const focalLength = 1200;
+        let scaleFactor = 90;
+
+        let isDragging = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+
+        canvas.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('mousemove', e => {
+            if (isDragging) {
+                const dx = e.clientX - lastMouseX;
+                const dy = e.clientY - lastMouseY;
+                
+                rotY -= dx * 0.005; 
+                rotX += dy * 0.005; 
+                
+                rotX = Math.max(-Math.PI/2 + 0.05, Math.min(Math.PI/2 - 0.05, rotX));
+                
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            }
+        });
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            scaleFactor *= (e.deltaY > 0 ? 0.9 : 1.1);
+            scaleFactor = Math.max(30, Math.min(scaleFactor, 400));
+        }, { passive: false });
+
+        let omega = 1.0;
+        let lambda = 2.0;
+        let amplitude = 1.5;
+        let time = 0;
+
+        document.getElementById('freq-slider').addEventListener('input', e => {
+            omega = parseFloat(e.target.value);
+            document.getElementById('freq-val').innerText = omega.toFixed(1);
+        });
+        document.getElementById('lambda-slider').addEventListener('input', e => {
+            lambda = parseFloat(e.target.value);
+            document.getElementById('lambda-val').innerText = lambda.toFixed(1);
+        });
+
+        function project(x, y, z) {
+            let x1 = x * Math.cos(rotY) - y * Math.sin(rotY);
+            let y1 = x * Math.sin(rotY) + y * Math.cos(rotY);
+            let z1 = z;
+            
+            let y2 = y1 * Math.cos(rotX) - z1 * Math.sin(rotX);
+            let z2 = y1 * Math.sin(rotX) + z1 * Math.cos(rotX);
+            
+            let xs = x1 * scaleFactor;
+            let ys = z2 * scaleFactor;
+            let zs = y2 * scaleFactor;
+
+            let scale = focalLength / (focalLength + zs);
+            return {
+                x: cx + xs * scale,
+                y: cy - ys * scale, 
+                z: zs,
+                scale: scale
+            };
+        }
+
+        function drawLine3D(p1, p2, color, width=1, dash=[]) {
+            const proj1 = project(p1.x, p1.y, p1.z);
+            const proj2 = project(p2.x, p2.y, p2.z);
+            if (proj1.scale < 0 || proj2.scale < 0) return;
+            ctx.beginPath();
+            if(dash.length > 0) ctx.setLineDash(dash);
+            else ctx.setLineDash([]);
+            ctx.moveTo(proj1.x, proj1.y);
+            ctx.lineTo(proj2.x, proj2.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawText3D(text, p, color, font="12px Inter") {
+            const proj = project(p.x, p.y, p.z);
+            if (proj.scale < 0) return;
+            ctx.fillStyle = color;
+            ctx.font = font;
+            ctx.fillText(text, proj.x + 5, proj.y - 5);
+        }
+
+        function getSphereWireframe(R) {
+            let items = [];
+            const segments = 40;
+            
+            const latCount = 6;
+            for (let i = 1; i < latCount; i++) {
+                let theta = (i / latCount) * Math.PI;
+                let z = R * Math.cos(theta);
+                let r_xy = R * Math.sin(theta);
+                for (let j = 0; j < segments; j++) {
+                    let phi1 = (j / segments) * 2 * Math.PI;
+                    let phi2 = ((j+1) / segments) * 2 * Math.PI;
+                    let p1 = { x: r_xy * Math.cos(phi1), y: r_xy * Math.sin(phi1), z: z };
+                    let p2 = { x: r_xy * Math.cos(phi2), y: r_xy * Math.sin(phi2), z: z };
+                    let projZ = (project(p1.x, p1.y, p1.z).z + project(p2.x, p2.y, p2.z).z) / 2;
+                    items.push({
+                        type: 'line', item: {p1: p1, p2: p2, color: 'rgba(0,0,0,0.06)', width: 1}, zSort: projZ
+                    });
+                }
+            }
+            
+            const lonCount = 8;
+            for (let i = 0; i < lonCount; i++) {
+                let phi = (i / lonCount) * 2 * Math.PI;
+                for (let j = 0; j < segments; j++) {
+                    let theta1 = (j / segments) * Math.PI;
+                    let theta2 = ((j+1) / segments) * Math.PI;
+                    let p1 = { x: R * Math.sin(theta1) * Math.cos(phi), y: R * Math.sin(theta1) * Math.sin(phi), z: R * Math.cos(theta1) };
+                    let p2 = { x: R * Math.sin(theta2) * Math.cos(phi), y: R * Math.sin(theta2) * Math.sin(phi), z: R * Math.cos(theta2) };
+                    let projZ = (project(p1.x, p1.y, p1.z).z + project(p2.x, p2.y, p2.z).z) / 2;
+                    items.push({
+                        type: 'line', item: {p1: p1, p2: p2, color: 'rgba(0,0,0,0.08)', width: 1.5}, zSort: projZ
+                    });
+                }
+            }
+            
+            for (let j = 0; j < segments; j++) {
+                let phi1 = (j / segments) * 2 * Math.PI;
+                let phi2 = ((j+1) / segments) * 2 * Math.PI;
+                let p1 = { x: R * Math.cos(phi1), y: R * Math.sin(phi1), z: 0 };
+                let p2 = { x: R * Math.cos(phi2), y: R * Math.sin(phi2), z: 0 };
+                let projZ = (project(p1.x, p1.y, p1.z).z + project(p2.x, p2.y, p2.z).z) / 2;
+                items.push({
+                    type: 'line', item: {p1: p1, p2: p2, color: 'rgba(0,0,0,0.15)', width: 2}, zSort: projZ
+                });
+            }
+
+            return items;
+        }
+
+        function generateRayData(ray, maxR, pointsCount) {
+            let data = { lines: [], curveE: [], curveH: [] };
+            
+            const k = 2 * Math.PI / lambda;
+            const th = ray.theta;
+            const ph = ray.phi;
+
+            const er = { x: Math.sin(th) * Math.cos(ph), y: Math.sin(th) * Math.sin(ph), z: Math.cos(th) };
+            let eTheta = { x: Math.cos(th) * Math.cos(ph), y: Math.cos(th) * Math.sin(ph), z: -Math.sin(th) };
+            if (Math.abs(Math.sin(th)) < 0.0001) {
+                eTheta = { x: Math.cos(ph), y: Math.sin(ph), z: 0 };
+            }
+            const ePhi = { x: -Math.sin(ph), y: Math.cos(ph), z: 0 };
+
+            data.axis = {p1: {x:0,y:0,z:0}, p2: {x:er.x*maxR, y:er.y*maxR, z:er.z*maxR}};
+
+            for(let i=0; i<=pointsCount; i++) {
+                let r = (i / pointsCount) * maxR;
+                if (r < 0.2) continue;
+
+                let env = amplitude * Math.sin(th) / Math.sqrt(r + 0.1) * 1.5; 
+                let phase = k * r - omega * time * 2;
+                let val = env * Math.cos(phase);
+
+                let pBase = {x: er.x * r, y: er.y * r, z: er.z * r};
+                
+                let pE = { x: pBase.x + eTheta.x * val, y: pBase.y + eTheta.y * val, z: pBase.z + eTheta.z * val };
+                let pH = { x: pBase.x + ePhi.x * val, y: pBase.y + ePhi.y * val, z: pBase.z + ePhi.z * val };
+
+                data.curveE.push(pE);
+                data.curveH.push(pH);
+
+                if (i % 3 === 0 && Math.abs(val) > 0.02) {
+                    data.lines.push({ p1: pBase, p2: pE, color: 'rgba(239, 68, 68, 0.4)' });
+                    data.lines.push({ p1: pBase, p2: pH, color: 'rgba(59, 130, 246, 0.4)' });
+                }
+            }
+            return data;
+        }
+
+        function drawAxesAndLabels() {
+            const l = 5;
+            drawLine3D({x:-l, y:0, z:0}, {x:l, y:0, z:0}, 'rgba(0,0,0,0.1)', 1); 
+            drawLine3D({x:0, y:-l, z:0}, {x:0, y:l, z:0}, 'rgba(0,0,0,0.1)', 1); 
+            drawLine3D({x:0, y:0, z:-l}, {x:0, y:0, z:l}, 'rgba(0,0,0,0.3)', 1.5); 
+            
+            drawText3D('X', {x:l+0.5, y:0, z:0}, 'rgba(0,0,0,0.5)', '14px Inter');
+            drawText3D('Y', {x:0, y:l+0.5, z:0}, 'rgba(0,0,0,0.5)', '14px Inter');
+            drawText3D('Z (振荡轴)', {x:0, y:0, z:l+0.5}, 'rgba(0,0,0,0.8)', 'bold 14px Inter');
+        }
+
+        function drawDipole() {
+            const qz = 0.5 * Math.sin(omega * time * 2);
+            const p1 = project(0, 0, qz);
+            if(p1.scale > 0) {
+                ctx.beginPath(); ctx.arc(p1.x, p1.y, 8 * p1.scale, 0, Math.PI*2);
+                ctx.fillStyle = '#ef4444'; ctx.fill();
+            }
+            const p2 = project(0, 0, -qz);
+            if(p2.scale > 0) {
+                ctx.beginPath(); ctx.arc(p2.x, p2.y, 8 * p2.scale, 0, Math.PI*2);
+                ctx.fillStyle = '#3b82f6'; ctx.fill();
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawAxesAndLabels();
+
+            let rays = [];
+            if (viewMode === 'custom') {
+                rays.push({theta: customTheta * Math.PI / 180, phi: customPhi * Math.PI / 180}); 
+            } else if (viewMode === 'equator') {
+                rays.push({theta: Math.PI/2, phi: 0});
+                rays.push({theta: Math.PI/2, phi: Math.PI/2});
+                rays.push({theta: Math.PI/2, phi: Math.PI});
+                rays.push({theta: Math.PI/2, phi: 3*Math.PI/2});
+            } else if (viewMode === 'meridian') {
+                rays.push({theta: Math.PI/4, phi: 0});
+                rays.push({theta: 3*Math.PI/4, phi: 0});
+                rays.push({theta: Math.PI/4, phi: Math.PI});
+                rays.push({theta: 3*Math.PI/4, phi: Math.PI});
+            } else if (viewMode === 'full') {
+                rays.push({theta: Math.PI/4, phi: Math.PI/4});
+                rays.push({theta: Math.PI/4, phi: 3*Math.PI/4});
+                rays.push({theta: 3*Math.PI/4, phi: Math.PI/4});
+                rays.push({theta: 3*Math.PI/4, phi: 3*Math.PI/4});
+            }
+
+            const maxR = 8;
+            const pointsCount = 120;
+            let drawItems = [];
+
+            drawItems = drawItems.concat(getSphereWireframe(5.5));
+
+            rays.forEach(ray => {
+                let rData = generateRayData(ray, maxR, pointsCount);
+                
+                drawItems.push({
+                    type: 'line',
+                    item: {p1: rData.axis.p1, p2: rData.axis.p2, color: 'rgba(0,0,0,0.2)', width: 1.5, dash: [4,4]},
+                    zSort: (project(rData.axis.p1.x, rData.axis.p1.y, rData.axis.p1.z).z + project(rData.axis.p2.x, rData.axis.p2.y, rData.axis.p2.z).z)/2
+                });
+
+                rData.lines.forEach(line => {
+                    let projZ = (project(line.p1.x, line.p1.y, line.p1.z).z + project(line.p2.x, line.p2.y, line.p2.z).z) / 2;
+                    drawItems.push({ type: 'line', item: line, zSort: projZ });
+                });
+
+                for(let i=0; i<rData.curveE.length - 1; i++) {
+                    let p1 = rData.curveE[i]; let p2 = rData.curveE[i+1];
+                    let projZ = (project(p1.x, p1.y, p1.z).z + project(p2.x, p2.y, p2.z).z) / 2;
+                    drawItems.push({ type: 'line', item: {p1: p1, p2: p2, color: 'rgba(239, 68, 68, 1)', width: 2.5}, zSort: projZ });
+                }
+                for(let i=0; i<rData.curveH.length - 1; i++) {
+                    let p1 = rData.curveH[i]; let p2 = rData.curveH[i+1];
+                    let projZ = (project(p1.x, p1.y, p1.z).z + project(p2.x, p2.y, p2.z).z) / 2;
+                    drawItems.push({ type: 'line', item: {p1: p1, p2: p2, color: 'rgba(59, 130, 246, 1)', width: 2.5}, zSort: projZ });
+                }
+            });
+
+            drawItems.sort((a, b) => b.zSort - a.zSort);
+
+            drawItems.forEach(d => {
+                drawLine3D(d.item.p1, d.item.p2, d.item.color, d.item.width || 1, d.item.dash || []);
+            });
+
+            drawDipole();
+
+            time += 0.016;
+            requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
+</body>
+</html>
