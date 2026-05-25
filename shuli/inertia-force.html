@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>惯性力：加速参考系中的表观力</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #d8e1ea;
+      --blue: #1f63d4;
+      --blue-soft: #e9f1ff;
+      --red: #d83b42;
+      --red-soft: #ffe9eb;
+      --green: #1d8a68;
+      --green-soft: #e7f6f1;
+      --amber: #b87512;
+      --amber-soft: #fff4dc;
+      --shadow: 0 14px 36px rgba(23, 32, 51, 0.08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 247, 251, 0.94)),
+        linear-gradient(120deg, #f7fbff 0%, #e7f1fa 48%, #f8f1e6 100%);
+      font-family: "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC", Arial, sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1320px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.2rem);
+      line-height: 1.18;
+      font-weight: 820;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 8px 0 0;
+      max-width: 900px;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.65;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.06);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .icon-button[aria-pressed="true"] {
+      color: #ffffff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .lab {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 338px;
+      gap: 14px;
+      min-height: 800px;
+    }
+
+    .stage,
+    .controls,
+    .note {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .stage {
+      overflow: hidden;
+      min-height: 800px;
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 800px;
+    }
+
+    .overlay {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      max-width: calc(100% - 32px);
+      pointer-events: none;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.86);
+      padding: 7px 10px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      line-height: 1.1;
+      backdrop-filter: blur(10px);
+    }
+
+    .badge strong {
+      color: var(--ink);
+    }
+
+    .side {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .controls {
+      padding: 14px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 4px;
+      border-radius: var(--radius);
+      background: #eef3f8;
+      border: 1px solid var(--line);
+    }
+
+    .tab {
+      min-height: 36px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 760;
+    }
+
+    .tab.active {
+      color: #ffffff;
+      background: var(--ink);
+      box-shadow: 0 8px 16px rgba(23, 32, 51, 0.16);
+    }
+
+    .control {
+      display: grid;
+      gap: 8px;
+    }
+
+    .control-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 0.92rem;
+      font-weight: 780;
+    }
+
+    .value {
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .switches {
+      display: grid;
+      gap: 8px;
+    }
+
+    .switch {
+      min-height: 40px;
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .switch input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--blue);
+    }
+
+    .readout {
+      display: grid;
+      gap: 8px;
+    }
+
+    .meter {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: #fbfdff;
+      display: grid;
+      gap: 7px;
+    }
+
+    .meter-line {
+      display: grid;
+      grid-template-columns: 72px 1fr 74px;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.83rem;
+      color: var(--muted);
+    }
+
+    .meter-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #edf2f6;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .meter-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      border-radius: 999px;
+      transform-origin: left center;
+      background: var(--blue);
+    }
+
+    .meter-fill.negative {
+      left: auto;
+      right: 50%;
+      transform-origin: right center;
+    }
+
+    .meter-fill.red {
+      background: var(--red);
+    }
+
+    .meter-fill.green {
+      background: var(--green);
+    }
+
+    .num {
+      text-align: right;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .note {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .note h2 {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .note p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.62;
+      font-size: 0.92rem;
+    }
+
+    .formula {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px 11px;
+      background: #fbfdff;
+      color: var(--ink);
+      line-height: 1.55;
+      font-size: 0.95rem;
+      overflow-wrap: anywhere;
+    }
+
+    .formula .blue {
+      color: var(--blue);
+      font-weight: 760;
+    }
+
+    .formula .red {
+      color: var(--red);
+      font-weight: 760;
+    }
+
+    .legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .legend-item {
+      min-height: 34px;
+      border-radius: var(--radius);
+      padding: 8px 9px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: #fbfdff;
+    }
+
+    .legend-item b {
+      color: var(--ink);
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 980px) {
+      .page {
+        padding: 12px;
+      }
+
+      header {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .lab {
+        grid-template-columns: 1fr;
+      }
+
+      .stage,
+      canvas {
+        min-height: 720px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 1.42rem;
+      }
+
+      .lead {
+        font-size: 0.92rem;
+      }
+
+      .stage,
+      canvas {
+        min-height: 680px;
+      }
+
+      .meter-line {
+        grid-template-columns: 62px 1fr 64px;
+        gap: 6px;
+      }
+
+      .legend {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div>
+        <h1>惯性力：加速车厢里多出来的那一项</h1>
+        <p class="lead">惯性系里，真实合力给出质点的加速度。站到加速车厢中，质点的相对加速度变成 <strong>a' = a - a<sub>0</sub></strong>，于是需要补上 <strong>f* = -m a<sub>0</sub></strong>，才能继续写成牛顿第二定律的形式。</p>
+      </div>
+      <div class="toolbar" aria-label="动画控制">
+        <button class="icon-button" id="playBtn" title="暂停 / 播放" aria-label="暂停 / 播放">Ⅱ</button>
+        <button class="icon-button" id="resetBtn" title="重置运动" aria-label="重置运动">↺</button>
+      </div>
+    </header>
+
+    <section class="lab">
+      <div class="stage">
+        <canvas id="scene" aria-label="惯性力互动演示"></canvas>
+        <div class="overlay">
+          <div class="badge"><strong>S</strong>：地面惯性系</div>
+          <div class="badge"><strong>S'</strong>：随车厢加速的非惯性系</div>
+          <div class="badge"><strong>蓝</strong> 真实力 F</div>
+          <div class="badge"><strong>红</strong> 惯性力 f*</div>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="controls" aria-label="参数面板">
+          <!-- 移除了原有的标签切换，改为上下分屏对比 -->
+          <div class="control">
+            <div class="control-head">
+              <span>车厢加速度 a<sub>0</sub></span>
+              <span class="value" id="a0Value">1.20 m/s²</span>
+            </div>
+            <input id="a0Slider" type="range" min="-2.5" max="2.5" value="1.2" step="0.05">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <span>真实水平合力 F</span>
+              <span class="value" id="forceValue">0.00 N</span>
+            </div>
+            <input id="forceSlider" type="range" min="-5" max="5" value="0" step="0.1">
+          </div>
+
+          <div class="control">
+            <div class="control-head">
+              <span>质点质量 m</span>
+              <span class="value" id="massValue">1.50 kg</span>
+            </div>
+            <input id="massSlider" type="range" min="0.5" max="4" value="1.5" step="0.1">
+          </div>
+
+          <div class="switches">
+            <label class="switch">
+              <input type="checkbox" id="pseudoToggle" checked>
+              <span>显示惯性力 f* = -m a<sub>0</sub></span>
+            </label>
+            <label class="switch">
+              <input type="checkbox" id="trailToggle" checked>
+              <span>显示运动轨迹</span>
+            </label>
+          </div>
+
+          <div class="readout" aria-label="数值读数">
+            <div class="meter">
+              <div class="meter-line">
+                <span>F</span>
+                <div class="meter-track"><div class="meter-fill" id="forceBar"></div></div>
+                <span class="num" id="forceRead">0.00 N</span>
+              </div>
+              <div class="meter-line">
+                <span>f*</span>
+                <div class="meter-track"><div class="meter-fill red" id="pseudoBar"></div></div>
+                <span class="num" id="pseudoRead">-1.80 N</span>
+              </div>
+              <div class="meter-line">
+                <span>ma'</span>
+                <div class="meter-track"><div class="meter-fill green" id="apparentBar"></div></div>
+                <span class="num" id="apparentRead">-1.80 N</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="note">
+          <h2>运动学效应与动力学等效</h2>
+          <div class="formula">
+            S 系：<span class="blue">F = ma</span><br>
+            加速平动：a = a' + a<sub>0</sub><br>
+            S' 系：F = m(a' + a<sub>0</sub>)<br>
+            移项得：<span class="blue">F</span> + <span class="red">(-ma<sub>0</sub>)</span> = ma'
+          </div>
+          <p>这正是引入惯性力 <span class="red">f* = -ma<sub>0</sub></span> 的本质：<strong>把参考系加速带来的运动学效应（-a<sub>0</sub>），等效为受力上的动力学效应（一个虚拟的力 f*）</strong>，从而让非惯性系也能继续沿用牛顿第二定律的形式。</p>
+          <p>真实力合外力 F 来自物体间的相互作用。惯性力 f* 没有施力者，它是物体惯性在非惯性系中的表现。</p>
+          <div class="legend">
+            <div class="legend-item"><b>a</b>：地面系中的质点加速度</div>
+            <div class="legend-item"><b>a'</b>：车厢系中的相对加速度</div>
+            <div class="legend-item"><b>a<sub>0</sub></b>：车厢相对地面的加速度</div>
+            <div class="legend-item"><b>f*</b>：非惯性系中引入的惯性力</div>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <footer>课堂参考：第二章 牛顿运动定律(1-4节)，第 28-31 页。页面为单文件原生 HTML/CSS/JS + Canvas。</footer>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+
+    const state = {
+      paused: false,
+      showPseudo: true,
+      showTrail: true,
+      a0: 1.2,
+      force: 0,
+      mass: 1.5,
+      t: 0,
+      last: performance.now()
+    };
+
+    const els = {
+      playBtn: document.getElementById("playBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      a0Slider: document.getElementById("a0Slider"),
+      forceSlider: document.getElementById("forceSlider"),
+      massSlider: document.getElementById("massSlider"),
+      pseudoToggle: document.getElementById("pseudoToggle"),
+      trailToggle: document.getElementById("trailToggle"),
+      a0Value: document.getElementById("a0Value"),
+      forceValue: document.getElementById("forceValue"),
+      massValue: document.getElementById("massValue"),
+      forceRead: document.getElementById("forceRead"),
+      pseudoRead: document.getElementById("pseudoRead"),
+      apparentRead: document.getElementById("apparentRead"),
+      forceBar: document.getElementById("forceBar"),
+      pseudoBar: document.getElementById("pseudoBar"),
+      apparentBar: document.getElementById("apparentBar")
+    };
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function physicsAt(t) {
+      const a = state.force / state.mass;
+      const relA = a - state.a0;
+      const carX = 0.5 * state.a0 * t * t;
+      const ballX = 0.5 * a * t * t;
+      const relX = 0.5 * relA * t * t;
+      const pseudo = -state.mass * state.a0;
+      const apparent = state.force + pseudo;
+      return { a, relA, carX, ballX, relX, pseudo, apparent };
+    }
+
+    function fmt(value, unit) {
+      const sign = Math.abs(value) < 0.005 ? 0 : value;
+      return `${sign.toFixed(2)} ${unit}`;
+    }
+
+    function setBar(el, value, max) {
+      const pct = Math.min(50, Math.abs(value) / max * 50);
+      el.style.width = `${pct}%`;
+      el.classList.toggle("negative", value < 0);
+    }
+
+    function updateUi() {
+      els.a0Value.textContent = fmt(state.a0, "m/s²");
+      els.forceValue.textContent = fmt(state.force, "N");
+      els.massValue.textContent = fmt(state.mass, "kg");
+
+      const p = physicsAt(state.t % 4.8);
+      els.forceRead.textContent = fmt(state.force, "N");
+      els.pseudoRead.textContent = fmt(p.pseudo, "N");
+      els.apparentRead.textContent = fmt(p.apparent, "N");
+      setBar(els.forceBar, state.force, 7);
+      setBar(els.pseudoBar, p.pseudo, 10);
+      setBar(els.apparentBar, p.apparent, 10);
+
+      els.playBtn.textContent = state.paused ? "▶" : "Ⅱ";
+      els.playBtn.setAttribute("aria-pressed", String(!state.paused));
+    }
+
+    function roundedRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function drawArrow(x1, y1, x2, y2, color, label, width = 3) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len = Math.hypot(dx, dy);
+      if (len < 4) return;
+      const ux = dx / len;
+      const uy = dy / len;
+      const head = Math.min(16, Math.max(10, len * 0.22));
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - ux * head - uy * head * 0.45, y2 - uy * head + ux * head * 0.45);
+      ctx.lineTo(x2 - ux * head + uy * head * 0.45, y2 - uy * head - ux * head * 0.45);
+      ctx.closePath();
+      ctx.fill();
+
+      if (label) {
+        ctx.font = "700 14px Microsoft YaHei, Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(label, (x1 + x2) / 2, (y1 + y2) / 2 - 8);
+      }
+      ctx.restore();
+    }
+
+    function drawGrid(w, h) {
+      ctx.save();
+      ctx.strokeStyle = "#e7edf4";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 42) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 42) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawCar(cx, y, w, h, label) {
+      ctx.save();
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.strokeStyle = "#9aa8b8";
+      ctx.lineWidth = 2;
+      roundedRect(cx - w / 2, y - h / 2, w, h, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = "#c7d2df";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx - w / 2 + 14, y);
+      ctx.lineTo(cx + w / 2 - 14, y);
+      ctx.stroke();
+
+      ctx.fillStyle = "#172033";
+      ctx.font = "800 16px Microsoft YaHei, Arial";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      ctx.fillText(label, cx - w / 2 + 14, y - h / 2 + 12);
+
+      const wheelY = y + h / 2 + 12;
+      ctx.fillStyle = "#172033";
+      ctx.beginPath();
+      ctx.arc(cx - w * 0.32, wheelY, 9, 0, Math.PI * 2);
+      ctx.arc(cx + w * 0.32, wheelY, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawBall(x, y) {
+      ctx.save();
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#172033";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, 17, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#1f63d4";
+      ctx.beginPath();
+      ctx.arc(x - 5, y - 5, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawTrail(originX, y, unit, mode) {
+      if (!state.showTrail) return;
+      ctx.save();
+      ctx.strokeStyle = "rgba(31, 99, 212, 0.42)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath();
+      let moved = false;
+      for (let i = 0; i <= 80; i += 1) {
+        const t = (state.t % 4.8) * i / 80;
+        const p = physicsAt(t);
+        const x = originX + (mode === "ground" ? p.ballX : p.relX) * unit;
+        if (!moved) {
+          ctx.moveTo(x, y);
+          moved = true;
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawEquationBadge(x, y, text, isRed) {
+      ctx.save();
+      ctx.font = "800 15px Microsoft YaHei, Arial";
+      const tw = ctx.measureText(text).width;
+      ctx.fillStyle = "rgba(255,255,255,0.88)";
+      ctx.strokeStyle = "#d8e1ea";
+      ctx.lineWidth = 1;
+      roundedRect(x, y, tw + 20, 32, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = isRed ? "#d83b42" : "#172033";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, x + 10, y + 16);
+      ctx.restore();
+    }
+
+    function drawScene() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+      drawGrid(w, h);
+
+      const t = state.t % 4.8;
+      const p = physicsAt(t);
+      const maxDisp = 0.5 * Math.max(Math.abs(state.a0), Math.abs(p.a), Math.abs(p.relA), 0.5) * 4.8 * 4.8;
+      const unit = Math.min(42, Math.max(16, w * 0.34 / Math.max(maxDisp, 1)));
+      
+      const carW = Math.min(430, Math.max(260, w * 0.48));
+      const carH = Math.min(150, Math.max(110, h * 0.18));
+      const centerX = w * 0.5;
+      
+      const baseY1 = Math.max(160, h * 0.30);
+      const baseY2 = Math.max(baseY1 + carH + 80, h * 0.68);
+
+      // --- Ground S Frame ---
+      drawEquationBadge(28, baseY1 - carH / 2 - 42, `牛顿第二定律：F = ma = ${fmt(state.force, "N")}`, false);
+      ctx.save();
+      ctx.strokeStyle = "#b7c5d5";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(28, baseY1 + carH / 2 + 32);
+      ctx.lineTo(w - 28, baseY1 + carH / 2 + 32);
+      ctx.stroke();
+      ctx.restore();
+
+      const carX = centerX + p.carX * unit;
+      const ballX1 = centerX + p.ballX * unit;
+      drawCar(carX, baseY1, carW, carH, "S 系：地面视角 (惯性系)");
+      drawTrail(centerX, baseY1, unit, "ground");
+      drawBall(ballX1, baseY1);
+      drawArrow(carX + carW * 0.15, baseY1 - carH * 0.65, carX + carW * 0.15 + state.a0 * 46, baseY1 - carH * 0.65, "#b87512", "a₀", 3);
+      drawArrow(ballX1, baseY1 - 42, ballX1 + state.force * 18, baseY1 - 42, "#1f63d4", "F", 3);
+      drawArrow(ballX1, baseY1 + 42, ballX1 + p.a * 60, baseY1 + 42, "#1d8a68", "a", 3);
+      
+      if (Math.abs(state.force) < 0.01) {
+        ctx.save();
+        ctx.fillStyle = "#1f63d4";
+        ctx.font = "700 14px Microsoft YaHei, Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("合外力 F = 0", ballX1, baseY1 - 28);
+        ctx.restore();
+      }
+
+      // --- Car S' Frame ---
+      drawEquationBadge(28, baseY2 - carH / 2 - 42, `牛顿第二定律：F + f* = ma' = ${fmt(p.apparent, "N")}`, true);
+      ctx.save();
+      ctx.strokeStyle = "#b7c5d5";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(28, baseY2 + carH / 2 + 32);
+      ctx.lineTo(w - 28, baseY2 + carH / 2 + 32);
+      ctx.stroke();
+      ctx.restore();
+
+      const ballX2 = centerX + p.relX * unit;
+      drawCar(centerX, baseY2, carW, carH, "S' 系：车厢视角 (非惯性系)");
+      drawTrail(centerX, baseY2, unit, "car");
+      drawBall(ballX2, baseY2);
+      drawArrow(centerX + carW * 0.15, baseY2 - carH * 0.65, centerX + carW * 0.15 + state.a0 * 46, baseY2 - carH * 0.65, "#b87512", "a₀", 3);
+      drawArrow(ballX2, baseY2 - 46, ballX2 + state.force * 18, baseY2 - 46, "#1f63d4", "F", 3);
+      if (state.showPseudo) {
+        drawArrow(ballX2, baseY2 - 22, ballX2 + p.pseudo * 18, baseY2 - 22, "#d83b42", "f* = -ma₀", 3);
+      }
+      drawArrow(ballX2, baseY2 + 46, ballX2 + p.apparent * 18, baseY2 + 46, "#1d8a68", "ma'", 3);
+
+      ctx.save();
+      ctx.fillStyle = "#5f6b7a";
+      ctx.font = "13px Microsoft YaHei, Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText("向右为正方向", centerX, baseY2 + carH / 2 + 50);
+      ctx.restore();
+    }
+
+    function tick(now) {
+      const dt = Math.min(0.033, (now - state.last) / 1000);
+      state.last = now;
+      if (!state.paused) {
+        state.t += dt;
+      }
+      updateUi();
+      drawScene();
+      requestAnimationFrame(tick);
+    }
+
+    function setReference(next) {
+      state.reference = next;
+      state.t = 0;
+      updateUi();
+    }
+
+    els.playBtn.addEventListener("click", () => {
+      state.paused = !state.paused;
+      state.last = performance.now();
+      updateUi();
+    });
+
+    els.resetBtn.addEventListener("click", () => {
+      state.t = 0;
+      updateUi();
+    });
+
+    els.a0Slider.addEventListener("input", (event) => {
+      state.a0 = Number(event.target.value);
+      state.t = 0;
+      updateUi();
+    });
+
+    els.forceSlider.addEventListener("input", (event) => {
+      state.force = Number(event.target.value);
+      state.t = 0;
+      updateUi();
+    });
+
+    els.massSlider.addEventListener("input", (event) => {
+      state.mass = Number(event.target.value);
+      state.t = 0;
+      updateUi();
+    });
+
+    els.pseudoToggle.addEventListener("change", (event) => {
+      state.showPseudo = event.target.checked;
+      updateUi();
+    });
+
+    els.trailToggle.addEventListener("change", (event) => {
+      state.showTrail = event.target.checked;
+      updateUi();
+    });
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      drawScene();
+    });
+
+    resizeCanvas();
+    updateUi();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

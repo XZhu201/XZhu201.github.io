@@ -2,7 +2,26 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(pip show:*)",
+      "Bash(ffmpeg -version)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(find D:/my_Git/myWebpage_new -name *.mp4 -path *inertia*)",
+      "Bash(ls media/videos/inertia_animation/720p30/*.mp4)",
+      "Bash(printf \"file ''''media/videos/inertia_animation/720p30/AppleStory.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/NewtonLaws.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/FormulaIntro.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/SafetyBelt.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/Inertia.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/ColdKnowledge.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/ExamTips.mp4''''\\\\nfile ''''media/videos/inertia_animation/720p30/Ending.mp4''''\\\\n\")",
+      "Bash(ffmpeg -f concat -safe 0 -i concat.txt -c copy inertia_animation_full.mp4)",
+      "Bash(ls -lh \"D:/my_Git/myWebpage_new/素材/2026-03-21 惯性力/\"*.py)",
+      "Bash(ffmpeg -i inertia_animation_full.mp4 -i inertia_article_yunxi.mp3 -c:v copy -c:a aac -shortest inertia_with_audio.mp4)",
+      "Bash(ffprobe:*)",
+      "Bash(ls -lh D:/my_Git/myWebpage_new/素材/2026-03-21 惯性力/media/videos/inertia_scene/720p30/*.mp4)",
+      "Bash(printf \"file ''''media/videos/inertia_scene/720p30/TitleScene.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/AppleStory.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/NewtonTruth.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/NewtonLaws.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/FormulaIntro.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/SafetyBeltCar.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/InertiaConcept.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/SpaceRocket.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/RollerCoaster.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/Centrifuge.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/TidalForce.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/ExamTips.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/Ending.mp4''''\\\\nfile ''''media/videos/inertia_scene/720p30/Closing.mp4''''\\\\n\")",
+      "Bash(ffmpeg -f concat -safe 0 -i concat_list.txt -c copy scene_video.mp4)",
+      "Bash(ffmpeg -i scene_video.mp4 -i inertia_article_yunxi.mp3 -c:v copy -c:a aac -shortest inertia_scene_final.mp4)",
+      "Bash(ffmpeg -i inertia_scene_final.mp4 -af \"volume=2\" -c:v copy inertia_scene_final_loud.mp4)",
+      "Bash(ffmpeg -i scene_video.mp4 -i inertia_article_yunxi.mp3 -c:v libx264 -crf 18 -preset medium -c:a aac -b:a 192k -shortest inertia_scene_hq.mp4)",
+      "Bash(ffmpeg -i inertia_scene_hq.mp4 -af \"volume=1.5\" -c:v copy inertia_scene_volume_up.mp4)",
+      "Bash(ls:*)"
     ]
   }
 }
