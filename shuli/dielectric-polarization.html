@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>电介质极化动态图</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #4b5563;
+      --line: #d1d5db;
+      --panel: #ffffff;
+      --blue: #2f75b5;
+      --deep-blue: #123a7a;
+      --red: #ef1d1d;
+      --green: #8ecfb0;
+      --yellow: #ffd91a;
+      --shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: #f8fafc;
+      font-family: "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input { font: inherit; }
+
+    .page {
+      width: min(1500px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    header,
+    .control-bar,
+    .stage,
+    .notes article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2.3vw, 1.95rem);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 6px 0 0;
+      max-width: 980px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.55;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      min-width: 42px;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      color: white;
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .control-bar {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 0.9fr) minmax(280px, auto);
+      gap: 12px;
+      padding: 12px 14px;
+      align-items: center;
+    }
+
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .control-item {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .control-item label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .value {
+      color: var(--blue);
+      font-family: Consolas, "SFMono-Regular", monospace;
+      white-space: nowrap;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--blue);
+    }
+
+    .toggles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      user-select: none;
+    }
+
+    .check input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--blue);
+    }
+
+    .monitor {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 8px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 2px;
+      font-family: Consolas, "SFMono-Regular", monospace;
+      font-size: 0.98rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stage {
+      overflow: hidden;
+      min-height: 720px;
+      display: grid;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      min-height: 720px;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: linear-gradient(135deg, #ffffff 0%, #f7fbff 55%, #eef7f4 100%);
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .notes article {
+      padding: 12px 14px;
+    }
+
+    .notes h2 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .notes p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 6px 0 2px;
+    }
+
+    @media (max-width: 1180px) {
+      .control-bar,
+      .slider-grid,
+      .monitor,
+      .notes {
+        grid-template-columns: 1fr;
+      }
+
+      .stage,
+      .canvas-wrap {
+        min-height: 1120px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page { padding: 10px; }
+      header { grid-template-columns: 1fr; }
+      .toggles { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1 data-i18n="title">电介质极化的两种图像</h1>
+        <p class="lead" data-i18n="lead">左边展示有极分子的取向极化，右边展示无极分子的位移极化。拖动外加电场 E0，可以看到弱场、零场和反向场下的连续变化。</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn" id="langBtn">EN</button>
+        <button class="btn primary" id="playBtn" aria-label="pause">⏸</button>
+        <button class="btn" id="resetBtn" aria-label="reset">↺</button>
+      </div>
+    </header>
+
+    <section class="control-bar" aria-label="controls">
+      <div class="slider-grid">
+        <div class="control-item">
+          <label for="e0Slider"><span data-i18n="labelE0">外加电场 E0</span><span class="value" id="e0Val">0.00</span></label>
+          <input id="e0Slider" type="range" min="-100" max="100" value="0" step="1">
+        </div>
+        <div class="control-item">
+          <label for="tempSlider"><span data-i18n="labelTemp">热运动 T</span><span class="value"><span id="tempVal">100</span> K</span></label>
+          <input id="tempSlider" type="range" min="5" max="300" value="100" step="5">
+        </div>
+      </div>
+
+      <div class="toggles">
+        <label class="check"><input id="moleculeToggle" type="checkbox" checked><span data-i18n="toggleMolecules">显示分子</span></label>
+        <label class="check"><input id="boundToggle" type="checkbox" checked><span data-i18n="toggleBound">显示束缚电荷</span></label>
+        <label class="check"><input id="fieldToggle" type="checkbox" checked><span data-i18n="toggleField">显示外场箭头</span></label>
+        <label class="check"><input id="inducedToggle" type="checkbox" checked><span data-i18n="toggleInduced">显示感应场</span></label>
+      </div>
+
+      <div class="monitor">
+        <div class="metric"><span>E0</span><strong id="mE0">0.00</strong></div>
+        <div class="metric"><span>E内</span><strong id="mE">0.00</strong></div>
+        <div class="metric"><span>E'</span><strong id="mEp">0.00</strong></div>
+      </div>
+    </section>
+
+    <section class="stage">
+      <div class="canvas-wrap">
+        <canvas id="stageCanvas"></canvas>
+      </div>
+    </section>
+
+    <section class="notes">
+      <article>
+        <h2 data-i18n="note1Title">取向极化看平均取向</h2>
+        <p data-i18n="note1Body">外场越强，有极分子的固有电偶极矩越倾向于沿电场方向排列；外场很弱时，热运动使取向仍然比较散乱。</p>
+      </article>
+      <article>
+        <h2 data-i18n="note2Title">位移极化看正负中心分离</h2>
+        <p data-i18n="note2Body">无极分子没有固有电偶极矩。外场使正负电荷中心沿相反方向错开，场越强，错开越明显。</p>
+      </article>
+      <article>
+        <h2 data-i18n="note3Title">宏观结果都是束缚电荷</h2>
+        <p data-i18n="note3Body">两种极化分别发生在不同模型的介质中，但宏观上都会在端面留下未抵消的束缚电荷，并产生反向感应场。</p>
+      </article>
+    </section>
+
+    <footer data-i18n="footer">Cyber Physics Lab - 电介质极化 PPT 风格动态图 v8</footer>
+  </div>
+
+  <script>
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        this.moveTo(x + rr, y);
+        this.arcTo(x + w, y, x + w, y + h, rr);
+        this.arcTo(x + w, y + h, x, y + h, rr);
+        this.arcTo(x, y + h, x, y, rr);
+        this.arcTo(x, y, x + w, y, rr);
+        this.closePath();
+        return this;
+      };
+    }
+
+    const canvas = document.getElementById("stageCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const ui = {
+      e0: document.getElementById("e0Slider"),
+      temp: document.getElementById("tempSlider"),
+      e0Val: document.getElementById("e0Val"),
+      tempVal: document.getElementById("tempVal"),
+      molecules: document.getElementById("moleculeToggle"),
+      bound: document.getElementById("boundToggle"),
+      field: document.getElementById("fieldToggle"),
+      induced: document.getElementById("inducedToggle"),
+      lang: document.getElementById("langBtn"),
+      play: document.getElementById("playBtn"),
+      reset: document.getElementById("resetBtn"),
+      mE0: document.getElementById("mE0"),
+      mE: document.getElementById("mE"),
+      mEp: document.getElementById("mEp")
+    };
+
+    const C = {
+      ink: "#111827",
+      muted: "#4b5563",
+      red: "#ef1d1d",
+      blue: "#2f75b5",
+      deepBlue: "#123a7a",
+      green: "#8ecfb0",
+      greenDark: "#5f9878",
+      yellow: "#ffd91a",
+      purple: "#7c3aed",
+      white: "#ffffff"
+    };
+
+    const state = {
+      lang: "zh",
+      running: true,
+      t: 0,
+      e0: 0,
+      temp: 100,
+      molecules: true,
+      bound: true,
+      field: true,
+      induced: true
+    };
+
+    const text = {
+      zh: {
+        title: "电介质极化的两种图像",
+        lead: "左边展示有极分子的取向极化，右边展示无极分子的位移极化。拖动外加电场 E0，可以看到弱场、零场和反向场下的连续变化。",
+        labelE0: "外加电场 E0",
+        labelTemp: "热运动 T",
+        toggleMolecules: "显示分子",
+        toggleBound: "显示束缚电荷",
+        toggleField: "显示外场箭头",
+        toggleInduced: "显示感应场",
+        note1Title: "取向极化看平均取向",
+        note1Body: "外场越强，有极分子的固有电偶极矩越倾向于沿电场方向排列；外场很弱时，热运动使取向仍然比较散乱。",
+        note2Title: "位移极化看正负中心分离",
+        note2Body: "无极分子没有固有电偶极矩。外场使正负电荷中心沿相反方向错开，场越强，错开越明显。",
+        note3Title: "宏观结果都是束缚电荷",
+        note3Body: "两种极化分别发生在不同模型的介质中，但宏观上都会在端面留下未抵消的束缚电荷，并产生反向感应场。",
+        footer: "Cyber Physics Lab - 电介质极化 PPT 风格动态图 v8",
+        orientationTitle: "取向极化",
+        orientationSub: "有极分子：固有电偶极矩逐渐沿外场排列",
+        displacementTitle: "位移极化",
+        displacementSub: "无极分子：正负电荷中心被外场拉开",
+        e0Zero: "E0 = 0",
+        e0Positive: "E0 > 0",
+        e0Negative: "E0 < 0",
+        alignment: "平均取向",
+        separation: "中心分离",
+        externalField: "外场 E0",
+        inducedField: "感应场 E'",
+        boundCharge: "束缚电荷"
+      },
+      en: {
+        title: "Two Pictures of Dielectric Polarization",
+        lead: "The left material shows orientation polarization of polar molecules. The right material shows displacement polarization of nonpolar molecules. Drag E0 to see weak, zero, and reversed fields.",
+        labelE0: "External field E0",
+        labelTemp: "Thermal motion T",
+        toggleMolecules: "Molecules",
+        toggleBound: "Bound charge",
+        toggleField: "External arrows",
+        toggleInduced: "Induced field",
+        note1Title: "Orientation polarization shows average alignment",
+        note1Body: "A stronger field aligns permanent dipoles more clearly. A weak field leaves the dipoles visibly disordered because of thermal motion.",
+        note2Title: "Displacement polarization shows separated centers",
+        note2Body: "Nonpolar molecules have no permanent dipole. The field separates positive and negative charge centers, and the separation grows with field strength.",
+        note3Title: "Both produce surface bound charge",
+        note3Body: "The two mechanisms belong to different dielectric models, but both leave uncompensated bound charge on the end faces and create an opposing induced field.",
+        footer: "Cyber Physics Lab - PPT-style dielectric polarization demo v8",
+        orientationTitle: "Orientation polarization",
+        orientationSub: "Polar molecules: permanent dipoles gradually align with E0",
+        displacementTitle: "Displacement polarization",
+        displacementSub: "Nonpolar molecules: positive and negative centers separate",
+        e0Zero: "E0 = 0",
+        e0Positive: "E0 > 0",
+        e0Negative: "E0 < 0",
+        alignment: "Mean alignment",
+        separation: "Center separation",
+        externalField: "External E0",
+        inducedField: "Induced E'",
+        boundCharge: "Bound charge"
+      }
+    };
+
+    const seeds = Array.from({ length: 24 }, (_, i) => ({
+      angle: ((i * 137.5) % 360) * Math.PI / 180,
+      phase: i * 1.91
+    }));
+
+    function tr(key) {
+      return text[state.lang][key] || key;
+    }
+
+    function readState() {
+      state.e0 = Number(ui.e0.value) / 100;
+      state.temp = Number(ui.temp.value);
+      state.molecules = ui.molecules.checked;
+      state.bound = ui.bound.checked;
+      state.field = ui.field.checked;
+      state.induced = ui.induced.checked;
+    }
+
+    function physics() {
+      const eps = 2.5;
+      const e = state.e0 / eps;
+      const ep = e - state.e0;
+      const abs = Math.abs(state.e0);
+      const dir = state.e0 >= 0 ? 1 : -1;
+      const thermal = state.temp / 300;
+      const alignment = abs < 0.01 ? 0 : Math.min(0.96, Math.pow(abs, 0.92) * (1 - thermal * 0.32));
+      return { eps, e, ep, abs, dir, thermal, alignment };
+    }
+
+    function fmt(n) {
+      return (Math.abs(n) < 0.005 ? 0 : n).toFixed(2);
+    }
+
+    function updateLanguage() {
+      document.documentElement.lang = state.lang === "zh" ? "zh-CN" : "en";
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        el.textContent = tr(el.getAttribute("data-i18n"));
+      });
+      ui.lang.textContent = state.lang === "zh" ? "EN" : "中文";
+    }
+
+    function updateReadout() {
+      const q = physics();
+      ui.e0Val.textContent = fmt(state.e0);
+      ui.tempVal.textContent = Math.round(state.temp);
+      ui.mE0.textContent = fmt(state.e0);
+      ui.mE.textContent = fmt(q.e);
+      ui.mEp.textContent = fmt(q.ep);
+    }
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = Math.max(720, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(680, Math.floor(rect.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function line(x1, y1, x2, y2, color, width = 2) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    function arrow(x1, y1, x2, y2, color, width = 3, head = 12, alpha = 1) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      const a = Math.atan2(y2 - y1, x2 - x1);
+      line(x1, y1, x2, y2, color, width);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - head * Math.cos(a - Math.PI / 7), y2 - head * Math.sin(a - Math.PI / 7));
+      ctx.lineTo(x2 - head * Math.cos(a + Math.PI / 7), y2 - head * Math.sin(a + Math.PI / 7));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function label(txt, x, y, size = 22, color = C.ink, align = "center", weight = "800") {
+      ctx.fillStyle = color;
+      ctx.font = `${weight} ${size}px "Microsoft YaHei", Arial, sans-serif`;
+      ctx.textAlign = align;
+      ctx.textBaseline = "middle";
+      ctx.fillText(txt, x, y);
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke = null, width = 2) {
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, r);
+      ctx.fillStyle = fill;
+      ctx.fill();
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = width;
+        ctx.stroke();
+      }
+    }
+
+    function mixAngle(a, b, t) {
+      let d = ((b - a + Math.PI) % (Math.PI * 2)) - Math.PI;
+      if (d < -Math.PI) d += Math.PI * 2;
+      return a + d * t;
+    }
+
+    function drawDipole(cx, cy, angle, scale = 1, alpha = 1) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      const len = 26 * scale;
+      const dx = Math.cos(angle) * len;
+      const dy = Math.sin(angle) * len;
+      ctx.lineWidth = 24 * scale;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = C.red;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx - dx, cy - dy);
+      ctx.stroke();
+      ctx.strokeStyle = C.yellow;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + dx, cy + dy);
+      ctx.stroke();
+      label("-", cx - dx * 0.58, cy - dy * 0.58 + 1, 16 * scale, C.ink);
+      label("+", cx + dx * 0.58, cy + dy * 0.58 + 1, 18 * scale, C.ink);
+      arrow(cx - dx * 0.35, cy - dy * 0.35 + 19 * scale, cx + dx * 0.35, cy + dy * 0.35 + 19 * scale, C.blue, 3 * scale, 8 * scale, 0.9);
+      ctx.restore();
+    }
+
+    function drawNonpolar(cx, cy, sep, scale = 1, alpha = 1) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (Math.abs(sep) < 1) {
+        const grad = ctx.createRadialGradient(cx - 5 * scale, cy - 5 * scale, 1, cx, cy, 25 * scale);
+        grad.addColorStop(0, C.yellow);
+        grad.addColorStop(1, C.red);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 23 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(17,24,39,0.18)";
+        ctx.lineWidth = 2 * scale;
+        ctx.stroke();
+        label("±", cx, cy + 1, 23 * scale, C.ink);
+      } else {
+        const sx = sep * scale;
+        ctx.fillStyle = C.red;
+        ctx.beginPath();
+        ctx.arc(cx - sx, cy, 19 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = C.yellow;
+        ctx.beginPath();
+        ctx.arc(cx + sx, cy, 19 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        label("-", cx - sx, cy + 1, 18 * scale, C.ink);
+        label("+", cx + sx, cy + 1, 20 * scale, C.ink);
+        arrow(cx - sx + 7 * Math.sign(sep), cy, cx + sx - 7 * Math.sign(sep), cy, C.blue, 3.2 * scale, 9 * scale);
+      }
+      ctx.restore();
+    }
+
+    function drawBoundCharges(x, y, h, dir, abs) {
+      if (!state.bound || abs < 0.025) return;
+      const count = Math.max(2, Math.round(2 + abs * 4));
+      const alpha = Math.min(1, 0.35 + abs * 1.1);
+      const leftSign = dir > 0 ? "-" : "+";
+      const rightSign = dir > 0 ? "+" : "-";
+      const leftColor = dir > 0 ? C.blue : C.red;
+      const rightColor = dir > 0 ? C.red : C.blue;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      for (let i = 0; i < count; i++) {
+        const yy = y + h * (i + 1) / (count + 1);
+        [[x + 10, leftSign, leftColor], [x + 0, leftSign, leftColor]].forEach(() => {});
+        ctx.fillStyle = leftColor;
+        ctx.beginPath();
+        ctx.arc(x + 14, yy, 12, 0, Math.PI * 2);
+        ctx.fill();
+        label(leftSign, x + 14, yy + 1, 18, leftSign === "-" ? C.white : C.ink);
+        ctx.fillStyle = rightColor;
+        ctx.beginPath();
+        ctx.arc(x + panelState.materialW - 14, yy, 12, 0, Math.PI * 2);
+        ctx.fill();
+        label(rightSign, x + panelState.materialW - 14, yy + 1, 18, rightSign === "-" ? C.white : C.ink);
+      }
+      ctx.restore();
+    }
+
+    const panelState = { materialW: 0 };
+
+    function drawSparseField(x, y, w, h, q) {
+      if (!state.field || q.abs < 0.02) {
+        label(tr("e0Zero"), x + w / 2, y + 70, 22, C.muted);
+        return;
+      }
+      const alpha = Math.min(1, 0.28 + q.abs * 0.65);
+      const ys = [y + 62, y + h - 62];
+      ys.forEach(yy => {
+        const start = q.dir > 0 ? x + 36 : x + w - 36;
+        const end = q.dir > 0 ? x + w - 36 : x + 36;
+        arrow(start, yy, end, yy, C.red, 4, 14, alpha);
+      });
+      label(q.dir > 0 ? tr("e0Positive") : tr("e0Negative"), x + w / 2, y + 32, 22, C.red);
+      label(tr("externalField"), q.dir > 0 ? x + w - 68 : x + 68, y + 94, 19, C.red);
+    }
+
+    function drawInducedField(x, y, w, h, q) {
+      if (!state.induced || q.abs < 0.03) return;
+      const yy = y + h - 30;
+      const start = q.dir > 0 ? x + w - 92 : x + 92;
+      const end = q.dir > 0 ? x + 92 : x + w - 92;
+      arrow(start, yy, end, yy, C.blue, 4, 13, Math.min(1, 0.35 + q.abs * 0.55));
+      label(tr("inducedField"), (start + end) / 2, yy - 26, 18, C.deepBlue);
+    }
+
+    function drawMeter(x, y, w, value, labelText, color) {
+      label(labelText, x, y + 10, 18, C.ink, "left");
+      roundRect(x + 112, y, w - 112, 20, 10, "rgba(255,255,255,0.85)", "rgba(17,24,39,0.20)", 1.5);
+      roundRect(x + 115, y + 3, Math.max(2, (w - 118) * value), 14, 7, color, null);
+      label(`${Math.round(value * 100)}%`, x + w + 10, y + 10, 18, C.muted, "left");
+    }
+
+    function drawMaterialBase(x, y, w, h) {
+      panelState.materialW = w;
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.16)";
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 10;
+      roundRect(x, y, w, h, 4, "rgba(231, 248, 239, 0.92)", "rgba(117, 166, 137, 0.58)", 2);
+      ctx.shadowColor = "transparent";
+      ctx.strokeStyle = "rgba(255,255,255,0.42)";
+      ctx.lineWidth = 2;
+      for (let i = 1; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.ellipse(x + w * i / 3, y + h / 2, 34, h / 2 - 8, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawOrientationPanel(panel, q) {
+      const { x, y, w, h } = panel;
+      roundRect(x, y, w, h, 8, "rgba(255,255,255,0.78)", "rgba(148,163,184,0.32)", 2);
+      label("➤ " + tr("orientationTitle"), x + 28, y + 38, 34, C.ink, "left");
+      label(tr("orientationSub"), x + 30, y + 76, 18, C.deepBlue, "left");
+      drawSparseField(x, y + 80, w, 110, q);
+
+      const mx = x + 56;
+      const my = y + 178;
+      const mw = w - 112;
+      const mh = 280;
+      drawMaterialBase(mx, my, mw, mh);
+      drawBoundCharges(mx, my, mh, q.dir, q.abs);
+
+      if (state.molecules) {
+        const cols = 4;
+        const rows = 3;
+        const target = q.dir > 0 ? 0 : Math.PI;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const i = r * cols + c;
+            const cx = mx + 82 + c * ((mw - 164) / (cols - 1));
+            const cy = my + 62 + r * ((mh - 124) / (rows - 1));
+            const wobble = Math.sin(state.t * 2 + seeds[i].phase) * (0.28 + q.thermal * 0.45) * (1 - q.alignment);
+            const angle = q.abs < 0.015 ? seeds[i].angle + Math.sin(state.t * 0.8 + seeds[i].phase) * 0.25 : mixAngle(seeds[i].angle, target, q.alignment) + wobble;
+            drawDipole(cx, cy, angle, 0.86, 0.98);
+          }
+        }
+      }
+      drawInducedField(mx, my, mw, mh, q);
+      drawMeter(x + 48, y + h - 60, w - 122, q.alignment, tr("alignment"), C.red);
+    }
+
+    function drawDisplacementPanel(panel, q) {
+      const { x, y, w, h } = panel;
+      roundRect(x, y, w, h, 8, "rgba(255,255,255,0.78)", "rgba(148,163,184,0.32)", 2);
+      label("➤ " + tr("displacementTitle"), x + 28, y + 38, 34, C.ink, "left");
+      label(tr("displacementSub"), x + 30, y + 76, 18, C.deepBlue, "left");
+      drawSparseField(x, y + 80, w, 110, q);
+
+      const mx = x + 56;
+      const my = y + 178;
+      const mw = w - 112;
+      const mh = 280;
+      drawMaterialBase(mx, my, mw, mh);
+      drawBoundCharges(mx, my, mh, q.dir, q.abs);
+
+      if (state.molecules) {
+        const cols = 4;
+        const rows = 3;
+        const sep = q.abs < 0.015 ? 0 : q.dir * (4 + q.abs * 28);
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const i = r * cols + c;
+            const cx = mx + 82 + c * ((mw - 164) / (cols - 1));
+            const cy = my + 62 + r * ((mh - 124) / (rows - 1));
+            const vibration = Math.sin(state.t * 3 + seeds[i].phase) * (1 - Math.min(1, q.abs)) * 2;
+            const visibleSep = q.abs < 0.015 ? 0 : sep + vibration;
+            drawNonpolar(cx, cy, visibleSep, 0.86, 0.98);
+          }
+        }
+      }
+      drawInducedField(mx, my, mw, mh, q);
+      drawMeter(x + 48, y + h - 60, w - 122, Math.min(1, q.abs), tr("separation"), C.blue);
+    }
+
+    function draw() {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const q = physics();
+      ctx.clearRect(0, 0, w, h);
+
+      const bg = ctx.createLinearGradient(0, 0, w, h);
+      bg.addColorStop(0, "#ffffff");
+      bg.addColorStop(0.58, "#f7fbff");
+      bg.addColorStop(1, "#eef7f4");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+
+      const stacked = w < 900;
+      const margin = stacked ? 28 : 52;
+      const gap = stacked ? 28 : 44;
+      if (stacked) {
+        const panelW = w - margin * 2;
+        const panelH = (h - margin * 2 - gap) / 2;
+        drawOrientationPanel({ x: margin, y: margin, w: panelW, h: panelH }, q);
+        drawDisplacementPanel({ x: margin, y: margin + panelH + gap, w: panelW, h: panelH }, q);
+      } else {
+        const panelH = h - margin * 2;
+        const panelW = (w - margin * 2 - gap) / 2;
+        drawOrientationPanel({ x: margin, y: margin, w: panelW, h: panelH }, q);
+        drawDisplacementPanel({ x: margin + panelW + gap, y: margin, w: panelW, h: panelH }, q);
+      }
+    }
+
+    function tick() {
+      readState();
+      if (state.running) state.t += 1 / 60;
+      updateReadout();
+      draw();
+      requestAnimationFrame(tick);
+    }
+
+    [ui.e0, ui.temp, ui.molecules, ui.bound, ui.field, ui.induced].forEach(el => {
+      el.addEventListener("input", () => {
+        readState();
+        updateReadout();
+        draw();
+      });
+    });
+
+    ui.lang.addEventListener("click", () => {
+      state.lang = state.lang === "zh" ? "en" : "zh";
+      updateLanguage();
+      draw();
+    });
+
+    ui.play.addEventListener("click", () => {
+      state.running = !state.running;
+      ui.play.textContent = state.running ? "⏸" : "▶";
+    });
+
+    ui.reset.addEventListener("click", () => {
+      ui.e0.value = 0;
+      ui.temp.value = 100;
+      state.t = 0;
+      readState();
+      updateReadout();
+      draw();
+    });
+
+    window.addEventListener("resize", () => {
+      resize();
+      draw();
+    });
+
+    updateLanguage();
+    readState();
+    resize();
+    tick();
+  </script>
+</body>
+</html>
