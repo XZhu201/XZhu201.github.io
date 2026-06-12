@@ -24,7 +24,7 @@ title: 数理天地
 - [📡 电偶极子电磁波辐射演示](./em-radiation.html)
   > 直观展示电偶极子辐射电磁波的空间分布与传播机制。
 
-- [🧪 电介质极化动态图](./dielectric-polarization.html)
+- [🧪 电介质极化演示](./dielectric-polarization.html)
   > 对比有极分子的取向极化和无极分子的位移极化，拖动外加电场观察弱场、零场和反向场下的连续变化。
 
 ---
